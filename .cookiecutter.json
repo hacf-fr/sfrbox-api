@@ -1,0 +1,10 @@
+{
+  "_template": "gh:cjolowicz/cookiecutter-hypermodern-python",
+  "author": "epenet",
+  "email": "mail@tbd.com",
+  "friendly_name": "SFR Box API",
+  "github_user": "hacf-fr",
+  "package_name": "sfrbox_api",
+  "project_name": "sfrbox-api",
+  "version": "0.0.0"
+}
