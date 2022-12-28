@@ -30,8 +30,8 @@ class SFRBox:
             raise Exception(f"Query failed: {err.get('msg')}")
         if stat != "ok":
             raise Exception(f"Response was not ok: {stat}")
-        result = element.find(method.rsplit(method)[0])
-        assert result
+        result = element.find(method.split(".")[0])
+        assert result is not None
         return result
 
     async def dsl_getInfo(self) -> DslInfo:
