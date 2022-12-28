@@ -18,6 +18,7 @@ Changelog = "https://github.com/epenet/sfrbox-api/releases"
 [tool.poetry.dependencies]
 python = "^3.7"
 httpx = "^0.23.1"
+click = { version = ">=8.0.1", optional = true }
 
 [tool.poetry.dev-dependencies]
 Pygments = ">=2.10.0"
