@@ -6,7 +6,7 @@ from xml.etree.ElementTree import Element as XmlElement  # noqa: S405
 import httpx
 from defusedxml.ElementTree import fromstring as xml_element_from_string
 
-from .exceptions import SfrBoxError
+from .exceptions import SFRBoxError
 from .models import DslInfo
 from .models import FtthInfo
 from .models import SystemInfo
@@ -28,19 +28,19 @@ class SFRBox:
         try:
             element: XmlElement = xml_element_from_string(response.text)
         except Exception as exc:
-            raise SfrBoxError(f"Failed to parse response: {response.text}") from exc
+            raise SFRBoxError(f"Failed to parse response: {response.text}") from exc
         stat = element.get("stat", "")
         if (
             stat == "fail"
             and (err := element.find("err")) is not None
             and (msg := err.get("msg"))
         ):
-            raise SfrBoxError(f"Query failed: {msg}")
+            raise SFRBoxError(f"Query failed: {msg}")
         if stat != "ok":
-            raise SfrBoxError(f"Response was not ok: {response.text}")
+            raise SFRBoxError(f"Response was not ok: {response.text}")
         result = element.find(namespace)
         if result is None:
-            raise SfrBoxError(
+            raise SFRBoxError(
                 f"Namespace {namespace} not found in response: {response.text}"
             )
         return result
