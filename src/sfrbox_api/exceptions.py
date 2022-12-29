@@ -1,5 +1,5 @@
 """SFR Box exceptions."""
 
 
-class SfrBoxError(Exception):
+class SFRBoxError(Exception):
     """SFR Box base exception."""

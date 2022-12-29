@@ -7,7 +7,7 @@ import pytest
 import respx
 
 from sfrbox_api.bridge import SFRBox
-from sfrbox_api.exceptions import SfrBoxError
+from sfrbox_api.exceptions import SFRBoxError
 from sfrbox_api.models import DslInfo
 from sfrbox_api.models import FtthInfo
 from sfrbox_api.models import SystemInfo
@@ -120,7 +120,7 @@ async def test_exception_fail() -> None:
     async with httpx.AsyncClient() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         with pytest.raises(
-            SfrBoxError, match=re.escape("Query failed: [message-erreur]")
+            SFRBoxError, match=re.escape("Query failed: [message-erreur]")
         ):
             await box.wan_get_info()
 
@@ -134,7 +134,7 @@ async def test_exception_invalid_xml() -> None:
     )
     async with httpx.AsyncClient() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
-        with pytest.raises(SfrBoxError, match="Failed to parse response: Invalid XML"):
+        with pytest.raises(SFRBoxError, match="Failed to parse response: Invalid XML"):
             await box.wan_get_info()
 
 
@@ -147,7 +147,7 @@ async def test_exception_incorrect_xml() -> None:
     )
     async with httpx.AsyncClient() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
-        with pytest.raises(SfrBoxError, match="Response was not ok: <incorrect_xml />"):
+        with pytest.raises(SFRBoxError, match="Response was not ok: <incorrect_xml />"):
             await box.wan_get_info()
 
 
@@ -160,5 +160,5 @@ async def test_exception_incorrect_namespace() -> None:
     )
     async with httpx.AsyncClient() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
-        with pytest.raises(SfrBoxError, match="Namespace wan not found in response"):
+        with pytest.raises(SFRBoxError, match="Namespace wan not found in response"):
             await box.wan_get_info()
