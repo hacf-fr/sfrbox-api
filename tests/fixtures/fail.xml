@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<rsp stat="fail" version="1.0">
+    <err code="[code-erreur]" msg="[message-erreur]" />
+</rsp>

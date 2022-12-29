@@ -3,11 +3,15 @@ import hashlib
 import hmac
 
 
+def _compute_hash(token: str, value: str) -> str:
+    """Compute single value hash."""
+    hash = hashlib.sha256(value.encode()).hexdigest()
+    return hmac.new(token.encode(), hash.encode(), hashlib.sha256).hexdigest()
+
+
 def compute_hash(token: str, username: str, password: str) -> str:
-    hash_username = hashlib.sha256(username.encode()).hexdigest()
-    hmac_username = hmac.new(token.encode(), hash_username.encode(), hashlib.sha256)
+    """Compute full username/password hash."""
+    hmac_username = _compute_hash(token, username)
+    hmac_password = _compute_hash(token, password)
 
-    hash_password = hashlib.sha256(password.encode()).hexdigest()
-    hmac_password = hmac.new(token.encode(), hash_password.encode(), hashlib.sha256)
-
-    return f"{hmac_username.hexdigest()}{hmac_password.hexdigest()}"
+    return f"{hmac_username}{hmac_password}"
