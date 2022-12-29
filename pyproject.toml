@@ -2,22 +2,27 @@
 name = "sfrbox-api"
 version = "0.0.1"
 description = "SFR Box API"
-authors = ["epenet <mail@claudiojolowicz.com>"]
+authors = ["epenet"]
 license = "MIT"
 readme = "README.md"
-homepage = "https://github.com/epenet/sfrbox-api"
-repository = "https://github.com/epenet/sfrbox-api"
+homepage = "https://github.com/hacf-fr/sfrbox-api"
+repository = "https://github.com/hacf-fr/sfrbox-api"
 documentation = "https://sfrbox-api.readthedocs.io"
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
 ]
 
 [tool.poetry.urls]
-Changelog = "https://github.com/epenet/sfrbox-api/releases"
+Changelog = "https://github.com/hacf-fr/sfrbox-api/releases"
 
 [tool.poetry.dependencies]
-python = "^3.7"
-httpx = "^0.23.1"
+python = ">=3.7.1,<4.0"
+httpx = ">=0.23.1"
+defusedxml = ">=0.7.1"
+pydantic = ">=1.10.2"
 click = { version = ">=8.0.1", optional = true }
 
 [tool.poetry.dev-dependencies]
@@ -37,7 +42,9 @@ pep8-naming = ">=0.12.1"
 pre-commit = ">=2.16.0"
 pre-commit-hooks = ">=4.1.0"
 pytest = ">=6.2.5"
+pytest-asyncio = ">=0.20.2"
 pyupgrade = ">=2.29.1"
+respx = ">=0.20.1"
 safety = ">=1.10.3"
 sphinx = ">=4.3.2"
 sphinx-autobuild = ">=2021.3.14"
@@ -76,6 +83,19 @@ pretty = true
 show_column_numbers = true
 show_error_codes = true
 show_error_context = true
+plugins = [
+  "pydantic.mypy"
+]
+
+[[tool.mypy.overrides]]
+module = 'defusedxml.*'
+ignore_missing_imports = true
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+warn_untyped_fields = true
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

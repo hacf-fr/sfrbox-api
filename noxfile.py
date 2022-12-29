@@ -151,7 +151,7 @@ def mypy(session: Session) -> None:
     """Type-check using mypy."""
     args = session.posargs or ["src", "tests", "docs/conf.py"]
     session.install(".[cli]")
-    session.install("mypy", "pytest")
+    session.install("mypy", "pytest", "respx")
     session.run("mypy", *args)
     if not session.posargs:
         session.run("mypy", f"--python-executable={sys.executable}", "noxfile.py")
@@ -185,8 +185,8 @@ def coverage(session: Session) -> None:
 @session(python=python_versions[0])
 def typeguard(session: Session) -> None:
     """Runtime type checking using Typeguard."""
-    session.install(".")
-    session.install("pytest", "typeguard", "pygments")
+    session.install(".[cli]")
+    session.install("pytest", "typeguard", "pygments", "pytest-asyncio", "respx")
     session.run("pytest", f"--typeguard-packages={package}", *session.posargs)
 
 
