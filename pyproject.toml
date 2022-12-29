@@ -9,7 +9,6 @@ homepage = "https://github.com/hacf-fr/sfrbox-api"
 repository = "https://github.com/hacf-fr/sfrbox-api"
 documentation = "https://sfrbox-api.readthedocs.io"
 classifiers = [
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -19,7 +18,7 @@ classifiers = [
 Changelog = "https://github.com/hacf-fr/sfrbox-api/releases"
 
 [tool.poetry.dependencies]
-python = ">=3.7.1,<4.0"
+python = ">=3.8,<4.0"
 httpx = ">=0.23.1"
 defusedxml = ">=0.7.1"
 pydantic = ">=1.10.2"
