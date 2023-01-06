@@ -13,10 +13,13 @@ def _empty_to_none(v: str) -> Optional[str]:
 class DslInfo:
     """Informations sur le lien ADSL."""
 
+    # validators
+    _empty_to_none = validator("uptime", pre=True, allow_reuse=True)(_empty_to_none)
+
     linemode: str
     """Mode du lien.
     (firmware >= 2.1.2)"""
-    uptime: int
+    uptime: Optional[int]
     """Nombre de seconde depuis la montée du lien.
 
     (firmware >= 2.1.2)"""
@@ -131,13 +134,15 @@ class WanInfo:
     """Informations génériques sur la connexion internet."""
 
     # validators
-    _empty_to_none = validator("uptime6", pre=True, allow_reuse=True)(_empty_to_none)
+    _empty_to_none = validator("uptime", "uptime6", pre=True, allow_reuse=True)(
+        _empty_to_none
+    )
 
     status: str
     """Status de la connexion internet.
 
     = (up|down)"""
-    uptime: int
+    uptime: Optional[int]
     """Temps de connexion internet v4 ou v6 (suivant les cas)"""
     ip_addr: str
     """Adresse IPv4 internet.
