@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sfrbox-api"
-version = "0.0.1"
+version = "0.0.2"
 description = "SFR Box API"
 authors = ["epenet"]
 license = "MIT"
