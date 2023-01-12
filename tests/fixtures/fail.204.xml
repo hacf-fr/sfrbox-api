@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" ?>
 <rsp stat="fail" version="1.0">
   <err code="204" msg="Invalid login and/or password" />
 </rsp>

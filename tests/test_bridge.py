@@ -58,13 +58,13 @@ async def test_authenticate_invalid_password() -> None:
         "&token=afd1baa4cb261bfc08ec2dc0ade3b4"
         "&hash=3e89f9170f9e64e5132aa6f72a520ffd45f952f259872a60e9acde5dba45ff64"
         "2df17d326805a188a8446a7cf9372132d617925ea7130947e9bbefa2a5b5bb84"
-    ).respond(text=_load_fixture("auth.checkToken.fail.xml"))
+    ).respond(text=_load_fixture("fail.204.xml"))
 
     async with httpx.AsyncClient() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         box._token = "previous_token"  # noqa: S105
         with pytest.raises(
-            SFRBoxApiError,
+            SFRBoxAuthenticationError,
             match=re.escape("Api call failed: [204] Invalid login and/or password"),
         ):
             await box.authenticate(password="invalid_password")  # noqa: S106

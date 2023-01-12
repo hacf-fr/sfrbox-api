@@ -82,7 +82,7 @@ class SFRBox:
             and (code := err.get("code"))
             and (msg := err.get("msg"))
         ):
-            if code in {"115"}:
+            if code in {"115", "204"}:
                 # Reset token on auth failure
                 self._token = None
                 raise SFRBoxAuthenticationError(f"Api call failed: [{code}] {msg}")
