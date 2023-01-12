@@ -36,9 +36,14 @@ async def test_authentication() -> None:
     async with httpx.AsyncClient() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         await box.authenticate(password="password")  # noqa: S106
-    assert box._username == "admin"
-    assert box._password == "password"  # noqa: S105
-    assert box._token == "afd1baa4cb261bfc08ec2dc0ade3b4"  # noqa: S105
+
+        assert box._username == "admin"
+        assert box._password == "password"  # noqa: S105
+        assert box._token == "afd1baa4cb261bfc08ec2dc0ade3b4"  # noqa: S105
+
+        # Ensure subsequent calls return existing token
+        respx.clear()
+        assert await box._ensure_token() == "afd1baa4cb261bfc08ec2dc0ade3b4"
 
 
 @respx.mock
