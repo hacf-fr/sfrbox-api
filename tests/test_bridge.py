@@ -7,6 +7,7 @@ import pytest
 import respx
 
 from sfrbox_api.bridge import SFRBox
+from sfrbox_api.exceptions import SFRBoxApiError
 from sfrbox_api.exceptions import SFRBoxError
 from sfrbox_api.models import DslInfo
 from sfrbox_api.models import FtthInfo
@@ -120,7 +121,7 @@ async def test_exception_fail() -> None:
     async with httpx.AsyncClient() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         with pytest.raises(
-            SFRBoxError, match=re.escape("Query failed: [message-erreur]")
+            SFRBoxApiError, match=re.escape("Api call failed: [message-erreur]")
         ):
             await box.wan_get_info()
 
