@@ -60,7 +60,7 @@ class SFRBox:
         element = await self._send_get("auth", "checkToken", token=token, hash=hash)
         return element.get("token", "")
 
-    def _check_response(self, response: str) -> XmlElement:
+    def _check_response(self, response: httpx.Response) -> XmlElement:
         _LOGGER.debug(
             'HTTP Response: %s %s "%s %s %s" %s',
             response.request.method,
