@@ -107,12 +107,10 @@ class SFRBox:
         namespace: str,
         method: str,
         *,
-        token: str | None = None,
+        token: str,
         data: Mapping[str, Any] | None = None,
     ) -> None:
-        params = httpx.QueryParams(method=f"{namespace}.{method}")
-        if token:
-            params = params.add("token", token)
+        params = httpx.QueryParams(method=f"{namespace}.{method}", token=token)
         response = await self._client.post(
             f"http://{self._ip}/api/1.0/", params=params, data=data
         )
