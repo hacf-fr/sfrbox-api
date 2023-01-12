@@ -22,7 +22,7 @@ def _load_fixture(filename: str) -> str:
 
 @respx.mock
 @pytest.mark.asyncio
-async def test_authentication() -> None:
+async def test_authenticate() -> None:
     """It exits with a status code of zero."""
     respx.get("http://192.168.0.1/api/1.0/?method=auth.getToken").respond(
         text=_load_fixture("auth.getToken.xml")
@@ -48,7 +48,7 @@ async def test_authentication() -> None:
 
 @respx.mock
 @pytest.mark.asyncio
-async def test_authentication_invalid_password() -> None:
+async def test_authenticate_invalid_password() -> None:
     """It exits with a status code of zero."""
     respx.get("http://192.168.0.1/api/1.0/?method=auth.getToken").respond(
         text=_load_fixture("auth.getToken.xml")
@@ -65,7 +65,7 @@ async def test_authentication_invalid_password() -> None:
         box._token = "previous_token"  # noqa: S105
         with pytest.raises(
             SFRBoxApiError,
-            match="Api call failed: Invalid login and/or password",
+            match=re.escape("Api call failed: [204] Invalid login and/or password"),
         ):
             await box.authenticate(password="invalid_password")  # noqa: S106
     assert box._username == "admin"
@@ -75,7 +75,7 @@ async def test_authentication_invalid_password() -> None:
 
 @respx.mock
 @pytest.mark.asyncio
-async def test_authentication_no_credentials() -> None:
+async def test_authenticate_no_credentials() -> None:
     """It exits with a status code of zero."""
     async with httpx.AsyncClient() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
@@ -85,7 +85,7 @@ async def test_authentication_no_credentials() -> None:
 
 @respx.mock
 @pytest.mark.asyncio
-async def test_authentication_method_not_allowed() -> None:
+async def test_authenticate_method_not_allowed() -> None:
     """It exits with a status code of zero."""
     respx.get("http://192.168.0.1/api/1.0/?method=auth.getToken").respond(
         text=_load_fixture("auth.getToken.xml").replace('"all"', '"button"')
@@ -101,7 +101,7 @@ async def test_authentication_method_not_allowed() -> None:
 
 @respx.mock
 @pytest.mark.asyncio
-async def test_bridge_dsl() -> None:
+async def test_dsl_getinfo() -> None:
     """It exits with a status code of zero."""
     respx.get("http://192.168.0.1/api/1.0/?method=dsl.getInfo").respond(
         text=_load_fixture("dsl.getInfo.xml")
@@ -128,7 +128,7 @@ async def test_bridge_dsl() -> None:
 
 @respx.mock
 @pytest.mark.asyncio
-async def test_bridge_ftth() -> None:
+async def test_ftth_getinfo() -> None:
     """It exits with a status code of zero."""
     respx.get("http://192.168.0.1/api/1.0/?method=ftth.getInfo").respond(
         text=_load_fixture("ftth.getInfo.xml")
@@ -141,7 +141,7 @@ async def test_bridge_ftth() -> None:
 
 @respx.mock
 @pytest.mark.asyncio
-async def test_bridge_system() -> None:
+async def test_system_getinfo() -> None:
     """It exits with a status code of zero."""
     respx.get("http://192.168.0.1/api/1.0/?method=system.getInfo").respond(
         text=_load_fixture("system.getInfo.xml")
@@ -170,7 +170,37 @@ async def test_bridge_system() -> None:
 
 @respx.mock
 @pytest.mark.asyncio
-async def test_bridge_wan() -> None:
+async def test_system_reboot() -> None:
+    """It exits with a status code of zero."""
+    respx.post(
+        "http://192.168.0.1/api/1.0/?method=system.reboot&token=afd1baa4cb261bfc08ec2dc0ade3b4"
+    ).respond(text=_load_fixture("ok.xml"))
+    async with httpx.AsyncClient() as client:
+        box = SFRBox(ip="192.168.0.1", client=client)
+        box._token = "afd1baa4cb261bfc08ec2dc0ade3b4"  # noqa: S105
+        await box.system_reboot()
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_system_reboot_bad_auth() -> None:
+    """It exits with a status code of zero."""
+    respx.post(
+        "http://192.168.0.1/api/1.0/?method=system.reboot&token=invalid_token"
+    ).respond(text=_load_fixture("fail.115.xml"))
+    async with httpx.AsyncClient() as client:
+        box = SFRBox(ip="192.168.0.1", client=client)
+        box._token = "invalid_token"  # noqa: S105
+        with pytest.raises(
+            SFRBoxAuthenticationError,
+            match=re.escape("Api call failed: [115] Authentication needed"),
+        ):
+            await box.system_reboot()
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_wan_getinfo() -> None:
     """It exits with a status code of zero."""
     respx.get("http://192.168.0.1/api/1.0/?method=wan.getInfo").respond(
         text=_load_fixture("wan.getInfo.xml")
@@ -193,7 +223,7 @@ async def test_bridge_wan() -> None:
 
 @respx.mock
 @pytest.mark.asyncio
-async def test_exception_fail() -> None:
+async def test_wan_getinfo_fail() -> None:
     """It exits with a status code of zero."""
     respx.get("http://192.168.0.1/api/1.0/?method=wan.getInfo").respond(
         text=_load_fixture("fail.xml")
@@ -201,14 +231,15 @@ async def test_exception_fail() -> None:
     async with httpx.AsyncClient() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         with pytest.raises(
-            SFRBoxApiError, match=re.escape("Api call failed: [message-erreur]")
+            SFRBoxApiError,
+            match=re.escape("Api call failed: [[code-erreur]] [message-erreur]"),
         ):
             await box.wan_get_info()
 
 
 @respx.mock
 @pytest.mark.asyncio
-async def test_exception_invalid_xml() -> None:
+async def test_wan_getinfo_invalid_xml() -> None:
     """It exits with a status code of zero."""
     respx.get("http://192.168.0.1/api/1.0/?method=wan.getInfo").respond(
         text="Invalid XML"
@@ -221,7 +252,7 @@ async def test_exception_invalid_xml() -> None:
 
 @respx.mock
 @pytest.mark.asyncio
-async def test_exception_incorrect_xml() -> None:
+async def test_wan_getinfo_incorrect_xml() -> None:
     """It exits with a status code of zero."""
     respx.get("http://192.168.0.1/api/1.0/?method=wan.getInfo").respond(
         text="<incorrect_xml />"
@@ -234,7 +265,7 @@ async def test_exception_incorrect_xml() -> None:
 
 @respx.mock
 @pytest.mark.asyncio
-async def test_exception_incorrect_namespace() -> None:
+async def test_wan_getinfo_incorrect_namespace() -> None:
     """It exits with a status code of zero."""
     respx.get("http://192.168.0.1/api/1.0/?method=wan.getInfo").respond(
         text=_load_fixture("dsl.getInfo.xml")
