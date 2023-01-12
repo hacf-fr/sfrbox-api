@@ -7,6 +7,7 @@ from xml.etree.ElementTree import Element as XmlElement  # noqa: S405
 import defusedxml.ElementTree as DefusedElementTree
 import httpx
 
+from .exceptions import SFRBoxApiError
 from .exceptions import SFRBoxError
 from .models import DslInfo
 from .models import FtthInfo
@@ -48,7 +49,7 @@ class SFRBox:
             and (err := element.find("err")) is not None
             and (msg := err.get("msg"))
         ):
-            raise SFRBoxError(f"Query failed: {msg}")
+            raise SFRBoxApiError(f"Api call failed: {msg}")
         if stat != "ok":
             raise SFRBoxError(f"Response was not ok: {response.text}")
         result = element.find(namespace)
