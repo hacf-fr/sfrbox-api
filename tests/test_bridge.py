@@ -23,7 +23,7 @@ def _load_fixture(filename: str) -> str:
 async def test_bridge_dsl() -> None:
     """It exits with a status code of zero."""
     respx.get("http://192.168.0.1/api/1.0/?method=dsl.getInfo").respond(
-        text=_load_fixture("dsl.xml")
+        text=_load_fixture("dsl.getInfo.xml")
     )
     async with httpx.AsyncClient() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
@@ -50,7 +50,7 @@ async def test_bridge_dsl() -> None:
 async def test_bridge_ftth() -> None:
     """It exits with a status code of zero."""
     respx.get("http://192.168.0.1/api/1.0/?method=ftth.getInfo").respond(
-        text=_load_fixture("ftth.xml")
+        text=_load_fixture("ftth.getInfo.xml")
     )
     async with httpx.AsyncClient() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
@@ -63,7 +63,7 @@ async def test_bridge_ftth() -> None:
 async def test_bridge_system() -> None:
     """It exits with a status code of zero."""
     respx.get("http://192.168.0.1/api/1.0/?method=system.getInfo").respond(
-        text=_load_fixture("system.xml")
+        text=_load_fixture("system.getInfo.xml")
     )
     async with httpx.AsyncClient() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
@@ -92,7 +92,7 @@ async def test_bridge_system() -> None:
 async def test_bridge_wan() -> None:
     """It exits with a status code of zero."""
     respx.get("http://192.168.0.1/api/1.0/?method=wan.getInfo").respond(
-        text=_load_fixture("wan.xml")
+        text=_load_fixture("wan.getInfo.xml")
     )
     async with httpx.AsyncClient() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
@@ -156,7 +156,7 @@ async def test_exception_incorrect_xml() -> None:
 async def test_exception_incorrect_namespace() -> None:
     """It exits with a status code of zero."""
     respx.get("http://192.168.0.1/api/1.0/?method=wan.getInfo").respond(
-        text=_load_fixture("dsl.xml")
+        text=_load_fixture("dsl.getInfo.xml")
     )
     async with httpx.AsyncClient() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
