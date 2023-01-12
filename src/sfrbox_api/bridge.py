@@ -43,10 +43,9 @@ class SFRBox:
     async def _ensure_token(self) -> str:
         if not self._token:
             self._token = await self._get_token()
-        assert self._token  # noqa: S101
         return self._token
 
-    async def _get_token(self) -> str | None:
+    async def _get_token(self) -> str:
         if not (self._username and self._password):
             raise SFRBoxAuthenticationError("Credentials not set")
         element = await self._send_get("auth", "getToken")
@@ -54,10 +53,10 @@ class SFRBox:
             raise SFRBoxAuthenticationError(
                 f"Password authentication is not allowed, valid methods: `{method}`"
             )
-        token = element.get("token")
+        token = element.get("token", "")
         hash = compute_hash(token, self._username, self._password)
         element = await self._send_get("auth", "checkToken", token=token, hash=hash)
-        return element.get("token")
+        return element.get("token", "")
 
     async def _send_get(self, namespace: str, method: str, **kwargs: str) -> XmlElement:
         params = httpx.QueryParams(method=f"{namespace}.{method}", **kwargs)
