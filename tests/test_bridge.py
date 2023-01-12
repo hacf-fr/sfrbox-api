@@ -8,6 +8,7 @@ import respx
 
 from sfrbox_api.bridge import SFRBox
 from sfrbox_api.exceptions import SFRBoxApiError
+from sfrbox_api.exceptions import SFRBoxAuthenticationError
 from sfrbox_api.exceptions import SFRBoxError
 from sfrbox_api.models import DslInfo
 from sfrbox_api.models import FtthInfo
@@ -17,6 +18,80 @@ from sfrbox_api.models import WanInfo
 
 def _load_fixture(filename: str) -> str:
     return pathlib.Path(__file__).parent.joinpath("fixtures", filename).read_text()
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_authentication() -> None:
+    """It exits with a status code of zero."""
+    respx.get("http://192.168.0.1/api/1.0/?method=auth.getToken").respond(
+        text=_load_fixture("auth.getToken.xml")
+    )
+    respx.get(
+        "http://192.168.0.1/api/1.0/?method=auth.checkToken"
+        "&token=afd1baa4cb261bfc08ec2dc0ade3b4"
+        "&hash=3e89f9170f9e64e5132aa6f72a520ffd45f952f259872a60e9acde5dba45ff64"
+        "88cc72099f52b8414e5b182b8e1c2b4b87863bd67b0134904adfe00ae6c6499e"
+    ).respond(text=_load_fixture("auth.checkToken.xml"))
+    async with httpx.AsyncClient() as client:
+        box = SFRBox(ip="192.168.0.1", client=client)
+        await box.authenticate(password="password")  # noqa: S106
+    assert box._username == "admin"
+    assert box._password == "password"  # noqa: S105
+    assert box._token == "afd1baa4cb261bfc08ec2dc0ade3b4"  # noqa: S105
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_authentication_invalid_password() -> None:
+    """It exits with a status code of zero."""
+    respx.get("http://192.168.0.1/api/1.0/?method=auth.getToken").respond(
+        text=_load_fixture("auth.getToken.xml")
+    )
+    respx.get(
+        "http://192.168.0.1/api/1.0/?method=auth.checkToken"
+        "&token=afd1baa4cb261bfc08ec2dc0ade3b4"
+        "&hash=3e89f9170f9e64e5132aa6f72a520ffd45f952f259872a60e9acde5dba45ff64"
+        "2df17d326805a188a8446a7cf9372132d617925ea7130947e9bbefa2a5b5bb84"
+    ).respond(text=_load_fixture("auth.checkToken.fail.xml"))
+
+    async with httpx.AsyncClient() as client:
+        box = SFRBox(ip="192.168.0.1", client=client)
+        box._token = "previous_token"  # noqa: S105
+        with pytest.raises(
+            SFRBoxApiError,
+            match="Api call failed: Invalid login and/or password",
+        ):
+            await box.authenticate(password="invalid_password")  # noqa: S106
+    assert box._username == "admin"
+    assert box._password == "invalid_password"  # noqa: S105
+    assert box._token is None
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_authentication_no_credentials() -> None:
+    """It exits with a status code of zero."""
+    async with httpx.AsyncClient() as client:
+        box = SFRBox(ip="192.168.0.1", client=client)
+        with pytest.raises(SFRBoxAuthenticationError, match="Credentials not set"):
+            await box._ensure_token()
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_authentication_method_not_allowed() -> None:
+    """It exits with a status code of zero."""
+    respx.get("http://192.168.0.1/api/1.0/?method=auth.getToken").respond(
+        text=_load_fixture("auth.getToken.xml").replace('"all"', '"button"')
+    )
+    async with httpx.AsyncClient() as client:
+        box = SFRBox(ip="192.168.0.1", client=client)
+        with pytest.raises(
+            SFRBoxAuthenticationError,
+            match="Password authentication is not allowed, valid methods: `button`",
+        ):
+            await box.authenticate(password="password")  # noqa: S106
 
 
 @respx.mock
