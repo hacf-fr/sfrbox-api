@@ -7,7 +7,10 @@ from xml.etree.ElementTree import Element as XmlElement  # noqa: S405
 import defusedxml.ElementTree as DefusedElementTree
 import httpx
 
+from sfrbox_api.helpers import compute_hash
+
 from .exceptions import SFRBoxApiError
+from .exceptions import SFRBoxAuthenticationError
 from .exceptions import SFRBoxError
 from .models import DslInfo
 from .models import FtthInfo
@@ -21,10 +24,39 @@ _LOGGER = logging.getLogger(__name__)
 class SFRBox:
     """SFR Box bridge."""
 
+    _token: str | None = None
+    _username: str | None = None
+    _password: str | None = None
+
     def __init__(self, *, ip: str, client: httpx.AsyncClient) -> None:
         """Initialise SFR Box bridge."""
         self._ip = ip
         self._client = client
+
+    async def authenticate(self, *, username: str = "admin", password: str) -> None:
+        """Initialise le token pour pouvoir accéder aux méthodes privées de l'API."""
+        self._username = username
+        self._password = password
+        self._token = None
+        await self._ensure_token()
+
+    async def _ensure_token(self) -> str:
+        if not self._token:
+            self._token = await self._get_token()
+        return self._token
+
+    async def _get_token(self) -> str:
+        if not (self._username and self._password):
+            raise SFRBoxAuthenticationError("Credentials not set")
+        element = await self._send_get("auth", "getToken")
+        if (method := element.get("method")) not in {"all", "passwd"}:
+            raise SFRBoxAuthenticationError(
+                f"Password authentication is not allowed, valid methods: `{method}`"
+            )
+        token = element.get("token", "")
+        hash = compute_hash(token, self._username, self._password)
+        element = await self._send_get("auth", "checkToken", token=token, hash=hash)
+        return element.get("token", "")
 
     async def _send_get(self, namespace: str, method: str, **kwargs: str) -> XmlElement:
         params = httpx.QueryParams(method=f"{namespace}.{method}", **kwargs)

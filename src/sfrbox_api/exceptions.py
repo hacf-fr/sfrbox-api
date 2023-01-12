@@ -7,3 +7,7 @@ class SFRBoxError(Exception):
 
 class SFRBoxApiError(Exception):
     """SFR Box api exception."""
+
+
+class SFRBoxAuthenticationError(Exception):
+    """SFR Box authentication exception."""
