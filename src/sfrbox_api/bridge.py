@@ -1,16 +1,20 @@
 """SFR Box bridge."""
 from __future__ import annotations
 
+import logging
 from xml.etree.ElementTree import Element as XmlElement  # noqa: S405
 
+import defusedxml.ElementTree as DefusedElementTree
 import httpx
-from defusedxml.ElementTree import fromstring as xml_element_from_string
 
 from .exceptions import SFRBoxError
 from .models import DslInfo
 from .models import FtthInfo
 from .models import SystemInfo
 from .models import WanInfo
+
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class SFRBox:
@@ -24,9 +28,18 @@ class SFRBox:
     async def _send_get(self, namespace: str, method: str, **kwargs: str) -> XmlElement:
         params = httpx.QueryParams(method=f"{namespace}.{method}", **kwargs)
         response = await self._client.get(f"http://{self._ip}/api/1.0/", params=params)
+        _LOGGER.debug(
+            'HTTP Response: %s %s "%s %s %s" %s',
+            response.request.method,
+            response.url,
+            response.http_version,
+            response.status_code,
+            response.reason_phrase,
+            response.text,
+        )
         response.raise_for_status()
         try:
-            element: XmlElement = xml_element_from_string(response.text)
+            element: XmlElement = DefusedElementTree.fromstring(response.text)
         except Exception as exc:
             raise SFRBoxError(f"Failed to parse response: {response.text}") from exc
         stat = element.get("stat", "")
