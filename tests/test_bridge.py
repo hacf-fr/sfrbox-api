@@ -274,3 +274,27 @@ async def test_wan_getinfo_incorrect_namespace() -> None:
         box = SFRBox(ip="192.168.0.1", client=client)
         with pytest.raises(SFRBoxError, match="Namespace wan not found in response"):
             await box.wan_get_info()
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_connect_timeout() -> None:
+    """It exits with a status code of zero."""
+    respx.get("http://192.168.0.1/api/1.0/?method=wan.getInfo").mock(
+        side_effect=httpx.ConnectTimeout
+    )
+    async with httpx.AsyncClient() as client:
+        box = SFRBox(ip="192.168.0.1", client=client)
+        with pytest.raises(SFRBoxError):
+            await box.wan_get_info()
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_500_error() -> None:
+    """It exits with a status code of zero."""
+    respx.get("http://192.168.0.1/api/1.0/?method=wan.getInfo").respond(500)
+    async with httpx.AsyncClient() as client:
+        box = SFRBox(ip="192.168.0.1", client=client)
+        with pytest.raises(SFRBoxError):
+            await box.wan_get_info()

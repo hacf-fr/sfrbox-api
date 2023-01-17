@@ -2,12 +2,18 @@
 from __future__ import annotations
 
 import logging
+from functools import wraps
 from typing import Any
+from typing import Awaitable
+from typing import Callable
+from typing import Coroutine
 from typing import Mapping
+from typing import TypeVar
 from xml.etree.ElementTree import Element as XmlElement  # noqa: S405
 
 import defusedxml.ElementTree as DefusedElementTree
 import httpx
+from typing_extensions import ParamSpec
 
 from sfrbox_api.helpers import compute_hash
 
@@ -21,6 +27,27 @@ from .models import WanInfo
 
 
 _LOGGER = logging.getLogger(__name__)
+_R = TypeVar("_R")
+_P = ParamSpec("_P")
+
+
+def _with_error_wrapping(
+    func: Callable[_P, Awaitable[_R]]
+) -> Callable[_P, Coroutine[Any, Any, _R]]:
+    """Catch httpx errors."""
+
+    @wraps(func)
+    async def wrapper(
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> _R:
+        """Catch RequestError errors and raise SFRBoxError."""
+        try:
+            return await func(*args, **kwargs)
+        except httpx.HTTPError as err:
+            raise SFRBoxError(str(err)) from err
+
+    return wrapper
 
 
 class SFRBox:
@@ -91,6 +118,7 @@ class SFRBox:
             raise SFRBoxError(f"Response was not ok: {response.text}")
         return element
 
+    @_with_error_wrapping
     async def _send_get(self, namespace: str, method: str, **kwargs: str) -> XmlElement:
         params = httpx.QueryParams(method=f"{namespace}.{method}", **kwargs)
         response = await self._client.get(f"http://{self._ip}/api/1.0/", params=params)
@@ -102,6 +130,7 @@ class SFRBox:
             )
         return result
 
+    @_with_error_wrapping
     async def _send_post(
         self,
         namespace: str,
