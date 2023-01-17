@@ -13,7 +13,6 @@ from xml.etree.ElementTree import Element as XmlElement  # noqa: S405
 
 import defusedxml.ElementTree as DefusedElementTree
 import httpx
-from typing_extensions import Concatenate
 from typing_extensions import ParamSpec
 
 from sfrbox_api.helpers import compute_hash
@@ -33,19 +32,18 @@ _P = ParamSpec("_P")
 
 
 def _with_error_wrapping(
-    func: Callable[Concatenate[SFRBox, _P], Awaitable[_R]]
-) -> Callable[Concatenate[SFRBox, _P], Coroutine[Any, Any, _R]]:
-    """Catch Renault errors."""
+    func: Callable[_P, Awaitable[_R]]
+) -> Callable[_P, Coroutine[Any, Any, _R]]:
+    """Catch httpx errors."""
 
     @wraps(func)
     async def wrapper(
-        self: SFRBox,
         *args: _P.args,
         **kwargs: _P.kwargs,
     ) -> _R:
         """Catch RequestError errors and raise SFRBoxError."""
         try:
-            return await func(self, *args, **kwargs)
+            return await func(*args, **kwargs)
         except httpx.HTTPError as err:
             raise SFRBoxError(str(err)) from err
 
