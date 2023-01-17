@@ -93,8 +93,13 @@ class SFRBox:
 
     async def _send_get(self, namespace: str, method: str, **kwargs: str) -> XmlElement:
         params = httpx.QueryParams(method=f"{namespace}.{method}", **kwargs)
-        response = await self._client.get(f"http://{self._ip}/api/1.0/", params=params)
-        element = self._check_response(response)
+        try:
+            response = await self._client.get(
+                f"http://{self._ip}/api/1.0/", params=params
+            )
+            element = self._check_response(response)
+        except httpx.HTTPError as err:
+            raise SFRBoxError() from err
         result = element.find(namespace)
         if result is None:
             raise SFRBoxError(
@@ -111,10 +116,13 @@ class SFRBox:
         data: Mapping[str, Any] | None = None,
     ) -> None:
         params = httpx.QueryParams(method=f"{namespace}.{method}", token=token)
-        response = await self._client.post(
-            f"http://{self._ip}/api/1.0/", params=params, data=data
-        )
-        self._check_response(response)
+        try:
+            response = await self._client.post(
+                f"http://{self._ip}/api/1.0/", params=params, data=data
+            )
+            self._check_response(response)
+        except httpx.HTTPError as err:
+            raise SFRBoxError() from err
 
     async def dsl_get_info(self) -> DslInfo:
         """Renvoie les informations sur le lien ADSL."""
