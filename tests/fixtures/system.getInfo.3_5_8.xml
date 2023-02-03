@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rsp stat="ok" version="1.0">
+     <system product_id="NB6V-SER-r0" mac_addr="e4:5d:51:00:11:22" net_mode="router" net_infra="adsl" uptime="762312" version_mainfirmware="NB6V-MAIN-R3.5.8" version_rescuefirmware="NB6V-MAIN-R3.4.5" version_bootloader="NB6V-BOOTLOADER-R3.3.2" version_dsldriver="NB6V-XDSL-A2pv6F038m" current_datetime="202302031201" refclient="" idur="RH7AA27" alimvoltage="12214" temperature="44699" />
+</rsp>

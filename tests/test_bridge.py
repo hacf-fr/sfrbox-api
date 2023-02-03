@@ -170,6 +170,35 @@ async def test_system_getinfo() -> None:
 
 @respx.mock
 @pytest.mark.asyncio
+async def test_system_getinfo_3_5_8() -> None:
+    """It exits with a status code of zero."""
+    respx.get("http://192.168.0.1/api/1.0/?method=system.getInfo").respond(
+        text=_load_fixture("system.getInfo.3_5_8.xml")
+    )
+    async with httpx.AsyncClient() as client:
+        box = SFRBox(ip="192.168.0.1", client=client)
+        info = await box.system_get_info()
+        assert info == SystemInfo(
+            product_id="NB6V-SER-r0",
+            mac_addr="e4:5d:51:00:11:22",
+            net_mode="router",
+            net_infra="adsl",
+            uptime=762312,
+            version_mainfirmware="NB6V-MAIN-R3.5.8",
+            version_rescuefirmware="NB6V-MAIN-R3.4.5",
+            version_bootloader="NB6V-BOOTLOADER-R3.3.2",
+            version_dsldriver="NB6V-XDSL-A2pv6F038m",
+            current_datetime="202302031201",
+            refclient="",
+            idur="RH7AA27",
+            alimvoltage=12214,
+            temperature=44699,
+            serial_number=None,
+        )
+
+
+@respx.mock
+@pytest.mark.asyncio
 async def test_system_reboot() -> None:
     """It exits with a status code of zero."""
     respx.post(
