@@ -123,7 +123,7 @@ class SystemInfo:
     """Température de la BOX exprimé en m°C.
 
     (firmware >= 3.5.0)"""
-    serial_number: str
+    serial_number: Optional[str] = None
     """Numéro de série de l'IAD.
 
     (firmware >= 4.0.0)"""
