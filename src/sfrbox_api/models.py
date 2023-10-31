@@ -1,11 +1,12 @@
 """SFR Box models."""
 from typing import Optional
+from typing import Union
 
 from pydantic import validator
 from pydantic.dataclasses import dataclass
 
 
-def _empty_to_none(v: str) -> Optional[str]:
+def _empty_to_none(v: Union[int, str, None]) -> Optional[Union[int, str, None]]:
     return None if v == "" else v
 
 
