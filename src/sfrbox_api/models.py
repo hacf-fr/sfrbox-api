@@ -14,7 +14,7 @@ class DslInfo:
     """Informations sur le lien ADSL."""
 
     # validators
-    _empty_to_none = validator("uptime", pre=True, allow_reuse=True)(_empty_to_none) # type: ignore
+    _empty_to_none = validator("uptime", pre=True, allow_reuse=True)(_empty_to_none)  # type: ignore
 
     linemode: str
     """Mode du lien.
@@ -134,7 +134,7 @@ class WanInfo:
     """Informations génériques sur la connexion internet."""
 
     # validators
-    _empty_to_none = validator("uptime", "uptime6", pre=True, allow_reuse=True)( # type: ignore
+    _empty_to_none = validator("uptime", "uptime6", pre=True, allow_reuse=True)(  # type: ignore
         _empty_to_none
     )
 
