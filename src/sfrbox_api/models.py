@@ -6,7 +6,7 @@ from typing import Union
 try:
     from pydantic.v1 import validator
     from pydantic.v1.dataclasses import dataclass
-except ImportError:
+except ImportError:  # pragma: no cover
     from pydantic import validator
     from pydantic.dataclasses import dataclass
 
