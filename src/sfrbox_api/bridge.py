@@ -24,6 +24,10 @@ from .models import DslInfo
 from .models import FtthInfo
 from .models import SystemInfo
 from .models import WanInfo
+from .models import WlanClient
+from .models import WlanClientList
+from .models import WlanInfo
+from .models import WlanWl0Info
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -119,6 +123,15 @@ class SFRBox:
         return element
 
     @_with_error_wrapping
+    async def _send_get_simple(
+        self, namespace: str, method: str, **kwargs: str
+    ) -> XmlElement:
+        params = httpx.QueryParams(method=f"{namespace}.{method}", **kwargs)
+        response = await self._client.get(f"http://{self._ip}/api/1.0/", params=params)
+        element = self._check_response(response)
+        return element
+
+    @_with_error_wrapping
     async def _send_get(self, namespace: str, method: str, **kwargs: str) -> XmlElement:
         params = httpx.QueryParams(method=f"{namespace}.{method}", **kwargs)
         response = await self._client.get(f"http://{self._ip}/api/1.0/", params=params)
@@ -169,3 +182,21 @@ class SFRBox:
         """Renvoie les informations génériques sur la connexion internet."""
         xml_response = await self._send_get("wan", "getInfo")
         return WanInfo(**xml_response.attrib)  # type: ignore[arg-type]
+
+    async def wlan_get_client_list(self) -> WlanClientList:
+        """Liste des clients WiFi."""
+        token = await self._ensure_token()
+        xml_response = await self._send_get_simple("wlan", "getClientList", token=token)
+        client_elements = xml_response.findall("client")
+        return WlanClientList(
+            clients=[WlanClient(**element.attrib) for element in client_elements]
+        )
+
+    async def wlan_get_info(self) -> WlanInfo:
+        """Renvoie les informations sur le WiFi."""
+        token = await self._ensure_token()
+        xml_response = await self._send_get("wlan", "getInfo", token=token)
+        wl0_element = xml_response.find("wl0")
+        assert wl0_element
+        wl0 = WlanWl0Info(**wl0_element.attrib)
+        return WlanInfo(**xml_response.attrib, wl0=wl0)
