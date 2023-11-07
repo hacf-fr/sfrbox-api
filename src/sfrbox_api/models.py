@@ -202,7 +202,7 @@ class WlanClient:
 class WlanClientList:
     """Liste des clients WiFi."""
 
-    clients: list[WlanClient]
+    clients: list["WlanClient"]
     """Liste des clients WiFi."""
 
 

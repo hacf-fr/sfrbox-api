@@ -197,6 +197,6 @@ class SFRBox:
         token = await self._ensure_token()
         xml_response = await self._send_get("wlan", "getInfo", token=token)
         wl0_element = xml_response.find("wl0")
-        assert wl0_element
+        assert wl0_element is not None
         wl0 = WlanWl0Info(**wl0_element.attrib)
         return WlanInfo(**xml_response.attrib, wl0=wl0)
