@@ -7,8 +7,8 @@ try:
     from pydantic.v1 import validator
     from pydantic.v1.dataclasses import dataclass
 except ImportError:  # pragma: no cover
-    from pydantic import validator
-    from pydantic.dataclasses import dataclass
+    from pydantic import validator  # type: ignore[assignment]
+    from pydantic.dataclasses import dataclass  # type: ignore[no-redef]
 
 
 def _empty_to_none(v: Union[int, str, None]) -> Optional[Union[int, str, None]]:
