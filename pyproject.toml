@@ -29,7 +29,7 @@ Changelog = "https://github.com/hacf-fr/sfrbox-api/releases"
 python = ">=3.8,<4.0"
 httpx = ">=0.23.1"
 defusedxml = ">=0.7.1"
-pydantic = ">=1.10.13,<2.0"
+pydantic = ">=1.10.13"
 click = { version = ">=8.0.1", optional = true }
 
 [tool.poetry.dev-dependencies]
