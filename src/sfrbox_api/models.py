@@ -186,3 +186,73 @@ class WanInfo:
     """Adresse IPv6 globale de la box.
 
     (firmware >= 3.4)"""
+
+
+@dataclass
+class WlanClient:
+    """Client WiFi."""
+
+    mac_addr: str
+    """Adresse MAC"""
+    ip_addr: str
+    """Adresse IP"""
+
+
+@dataclass
+class WlanClientList:
+    """Liste des clients WiFi."""
+
+    clients: "list[WlanClient]"
+    """Liste des clients WiFi."""
+
+
+@dataclass
+class WlanWl0Info:
+    """Informations sur le WiFi."""
+
+    ssid: str
+    """Nom du réseau."""
+    keytype: str
+    """Type de clé WEP.
+
+    = (ascii|hexa)"""
+    wpakey: str
+    """Clé WPA."""
+    wepkey: str
+    """Clé WEP primaire."""
+    enc: Optional[str] = None
+    """Encryption.
+
+    = (OPEN|WEP|WPA-PSK|WPA2-PSK|WPA-WPA2-PSK)
+
+    (firmware >= 2.1)"""
+    enctype: Optional[str] = None
+    """Type de clé WPA.
+
+    = (tkip|aes|tkipaes)
+
+    (firmware >= 3.2)"""
+
+
+@dataclass
+class WlanInfo:
+    """Informations sur le WiFi."""
+
+    active: str
+    """Activation.
+
+    = (on|off)"""
+    channel: str
+    """Canal."""
+    mode: str
+    """Mode radio.
+
+    = (auto|11b|11g|11n|11ng)"""
+    wl0: WlanWl0Info
+    """"""
+    mac_filtering: Optional[str] = None
+    """Activation du filtrage mac.
+
+    = (whitelist|blacklist|off)
+
+    (firmware >= 3.0.7)"""

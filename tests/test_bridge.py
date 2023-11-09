@@ -14,6 +14,10 @@ from sfrbox_api.models import DslInfo
 from sfrbox_api.models import FtthInfo
 from sfrbox_api.models import SystemInfo
 from sfrbox_api.models import WanInfo
+from sfrbox_api.models import WlanClient
+from sfrbox_api.models import WlanClientList
+from sfrbox_api.models import WlanInfo
+from sfrbox_api.models import WlanWl0Info
 
 
 def _load_fixture(filename: str) -> str:
@@ -247,6 +251,51 @@ async def test_wan_getinfo() -> None:
             status6="down",
             uptime6=None,
             ipv6_addr="",
+        )
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_wlan_getclientlist() -> None:
+    """It exits with a status code of zero."""
+    respx.get(
+        "http://192.168.0.1/api/1.0/?method=wlan.getClientList&token=afd1baa4cb261bfc08ec2dc0ade3b4"
+    ).respond(text=_load_fixture("wlan.getClientList.xml"))
+    async with httpx.AsyncClient() as client:
+        box = SFRBox(ip="192.168.0.1", client=client)
+        box._token = "afd1baa4cb261bfc08ec2dc0ade3b4"  # noqa: S105
+        info = await box.wlan_get_client_list()
+        assert info == WlanClientList(
+            clients=[
+                WlanClient(mac_addr="01:02:03:04:05:06", ip_addr="192.168.1.23"),
+                WlanClient(mac_addr="06:07:08:09:10:11", ip_addr="192.168.1.24"),
+            ]
+        )
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_wlan_getinfo() -> None:
+    """It exits with a status code of zero."""
+    respx.get(
+        "http://192.168.0.1/api/1.0/?method=wlan.getInfo&token=afd1baa4cb261bfc08ec2dc0ade3b4"
+    ).respond(text=_load_fixture("wlan.getInfo.xml"))
+    async with httpx.AsyncClient() as client:
+        box = SFRBox(ip="192.168.0.1", client=client)
+        box._token = "afd1baa4cb261bfc08ec2dc0ade3b4"  # noqa: S105
+        info = await box.wlan_get_info()
+        assert info == WlanInfo(
+            active="on",
+            channel="11",
+            mode="11ng",
+            mac_filtering="off",
+            wl0=WlanWl0Info(
+                ssid="NEUF_0060",
+                enc="WPA-PSK",
+                keytype="ascii",
+                wpakey="thazcynshag4knahadza",
+                wepkey="",
+            ),
         )
 
 

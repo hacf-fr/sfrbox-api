@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<rsp stat="ok" version="1.0">
+  <wlan active="on" channel="11" mode="11ng" mac_filtering="off">
+    <wl0 ssid="NEUF_0060" enc="WPA-PSK" keytype="ascii" wpakey="thazcynshag4knahadza" wepkey="" />
+  </wlan>
+</rsp>
