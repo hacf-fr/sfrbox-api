@@ -1,6 +1,7 @@
 """Test cases for the __main__ module."""
 import pathlib
 import re
+import time
 
 import httpx
 import pytest
@@ -211,6 +212,7 @@ async def test_system_reboot() -> None:
     async with httpx.AsyncClient() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         box._token = "afd1baa4cb261bfc08ec2dc0ade3b4"  # noqa: S105
+        box._token_time = time.time()
         await box.system_reboot()
 
 
@@ -224,6 +226,7 @@ async def test_system_reboot_bad_auth() -> None:
     async with httpx.AsyncClient() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         box._token = "invalid_token"  # noqa: S105
+        box._token_time = time.time()
         with pytest.raises(
             SFRBoxAuthenticationError,
             match=re.escape("Api call failed: [115] Authentication needed"),
@@ -264,6 +267,7 @@ async def test_wlan_getclientlist() -> None:
     async with httpx.AsyncClient() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         box._token = "afd1baa4cb261bfc08ec2dc0ade3b4"  # noqa: S105
+        box._token_time = time.time()
         info = await box.wlan_get_client_list()
         assert info == WlanClientList(
             clients=[
@@ -283,6 +287,7 @@ async def test_wlan_getinfo() -> None:
     async with httpx.AsyncClient() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         box._token = "afd1baa4cb261bfc08ec2dc0ade3b4"  # noqa: S105
+        box._token_time = time.time()
         info = await box.wlan_get_info()
         assert info == WlanInfo(
             active="on",

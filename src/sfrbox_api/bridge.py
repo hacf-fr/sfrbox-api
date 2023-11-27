@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+import time
 from functools import wraps
 from typing import Any
 from typing import Awaitable
@@ -58,6 +59,7 @@ class SFRBox:
     """SFR Box bridge."""
 
     _token: str | None = None
+    _token_time: float
     _username: str | None = None
     _password: str | None = None
 
@@ -74,8 +76,11 @@ class SFRBox:
         await self._ensure_token()
 
     async def _ensure_token(self) -> str:
-        if not self._token:
+        # La durée de validité du token semble être de 10 minutes.
+        # On met 5 minutes (300 secondes) pour éviter les surprises.
+        if not self._token or (time.time() - self._token_time) > 300:
             self._token = await self._get_token()
+            self._token_time = time.time()
         return self._token
 
     async def _get_token(self) -> str:
