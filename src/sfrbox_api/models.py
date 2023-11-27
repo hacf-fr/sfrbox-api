@@ -89,6 +89,11 @@ class FtthInfo:
 class SystemInfo:
     """Informations système."""
 
+    # validators
+    _empty_to_none = validator(
+        "alimvoltage", "temperature", pre=True, allow_reuse=True
+    )(_empty_to_none)
+
     product_id: str
     """L'ID du produit: $(NB)-$(HARD)-$(HARD_VERSION)."""
     mac_addr: str
@@ -109,23 +114,23 @@ class SystemInfo:
     """(indisponible sur NB5)
 
     (firmware >= 2.1.2)"""
-    current_datetime: str
+    current_datetime: Optional[str] = None
     """Date actuelle sous le format : "%Y%m%d%H%M".
 
     (firmware >= 3.2.0)"""
-    refclient: str
+    refclient: Optional[str] = None
     """Référence client.
 
     (firmware >= 3.2.0)"""
-    idur: str
+    idur: Optional[str] = None
     """Identifiant unique réseau.
 
     (firmware >= 3.4.0)"""
-    alimvoltage: int
+    alimvoltage: Optional[int] = None
     """Tension de l'alimentation exprimé en mV.
 
     (firmware >= 3.5.0)"""
-    temperature: int
+    temperature: Optional[int] = None
     """Température de la BOX exprimé en m°C.
 
     (firmware >= 3.5.0)"""
