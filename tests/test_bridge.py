@@ -385,24 +385,24 @@ async def test_500_error() -> None:
 
 @respx.mock
 @pytest.mark.asyncio
-async def test_start_wifi() -> None:
+async def test_enable_wifi() -> None:
     """It exits with a status code of zero."""
     respx.post(
-        "http://192.168.0.1/api/1.0/?method=wlan.start&token=afd1baa4cb261bfc08ec2dc0ade3b4"
+        "http://192.168.0.1/api/1.0/?method=wlan.enable&token=afd1baa4cb261bfc08ec2dc0ade3b4"
     ).respond(text=_load_fixture("ok.xml"))
     async with httpx.AsyncClient() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         box._token = "afd1baa4cb261bfc08ec2dc0ade3b4"  # noqa: S105
         box._token_time = time.time()
-        await box.wlan_start()
+        await box.wlan_enable()
 
 
 @respx.mock
 @pytest.mark.asyncio
-async def test_start_wifi_bad_auth() -> None:
+async def test_enable_wifi_bad_auth() -> None:
     """It exits with a status code of zero."""
     respx.post(
-        "http://192.168.0.1/api/1.0/?method=wlan.start&token=invalid_token"
+        "http://192.168.0.1/api/1.0/?method=wlan.enable&token=invalid_token"
     ).respond(text=_load_fixture("fail.115.xml"))
     async with httpx.AsyncClient() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
@@ -412,29 +412,29 @@ async def test_start_wifi_bad_auth() -> None:
             SFRBoxAuthenticationError,
             match=re.escape("Api call failed: [115] Authentication needed"),
         ):
-            await box.wlan_start()
+            await box.wlan_enable()
 
 
 @respx.mock
 @pytest.mark.asyncio
-async def test_stop_wifi() -> None:
+async def test_disable_wifi() -> None:
     """It exits with a status code of zero."""
     respx.post(
-        "http://192.168.0.1/api/1.0/?method=wlan.stop&token=afd1baa4cb261bfc08ec2dc0ade3b4"
+        "http://192.168.0.1/api/1.0/?method=wlan.disable&token=afd1baa4cb261bfc08ec2dc0ade3b4"
     ).respond(text=_load_fixture("ok.xml"))
     async with httpx.AsyncClient() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         box._token = "afd1baa4cb261bfc08ec2dc0ade3b4"  # noqa: S105
         box._token_time = time.time()
-        await box.wlan_stop()
+        await box.wlan_disable()
 
 
 @respx.mock
 @pytest.mark.asyncio
-async def test_stop_wifi_bad_auth() -> None:
+async def test_disable_wifi_bad_auth() -> None:
     """It exits with a status code of zero."""
     respx.post(
-        "http://192.168.0.1/api/1.0/?method=wlan.stop&token=invalid_token"
+        "http://192.168.0.1/api/1.0/?method=wlan.disable&token=invalid_token"
     ).respond(text=_load_fixture("fail.115.xml"))
     async with httpx.AsyncClient() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
@@ -444,7 +444,8 @@ async def test_stop_wifi_bad_auth() -> None:
             SFRBoxAuthenticationError,
             match=re.escape("Api call failed: [115] Authentication needed"),
         ):
-            await box.wlan_stop()
+            await box.wlan_disable()
+
 
 @respx.mock
 @pytest.mark.asyncio
