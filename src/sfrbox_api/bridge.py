@@ -205,3 +205,18 @@ class SFRBox:
         assert wl0_element is not None  # noqa: S101
         wl0 = WlanWl0Info(**wl0_element.attrib)
         return WlanInfo(**xml_response.attrib, wl0=wl0)
+
+    async def wlan_enable(self) -> None:
+        """Activer le WiFi."""
+        token = await self._ensure_token()
+        await self._send_post("wlan", "enable", token=token)
+
+    async def wlan_disable(self) -> None:
+        """Désactiver le WiFi."""
+        token = await self._ensure_token()
+        await self._send_post("wlan", "disable", token=token)
+
+    async def wlan_restart(self) -> None:
+        """Redémarrer le WiFi."""
+        token = await self._ensure_token()
+        await self._send_post("wlan", "restart", token=token)
