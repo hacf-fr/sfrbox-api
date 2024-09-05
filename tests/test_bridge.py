@@ -107,6 +107,33 @@ async def test_authenticate_method_not_allowed() -> None:
 
 @respx.mock
 @pytest.mark.asyncio
+async def test_dsl_getinfo_3dcm020200r015() -> None:
+    """It exits with a status code of zero."""
+    respx.get("http://192.168.0.1/api/1.0/?method=dsl.getInfo").respond(
+        text=_load_fixture("dsl.getInfo.3DCM020200r015.xml")
+    )
+    async with httpx.AsyncClient() as client:
+        box = SFRBox(ip="192.168.0.1", client=client)
+        info = await box.dsl_get_info()
+        assert info == DslInfo(
+            linemode="G.DMT",
+            uptime=4857,
+            counter=1,
+            crc=0,
+            status="up",
+            noise_down=4.5,
+            noise_up=4.2,
+            attenuation_down=3.2,
+            attenuation_up=5.2,
+            rate_down=8000,
+            rate_up=800,
+            line_status=None,
+            training=None,
+        )
+
+
+@respx.mock
+@pytest.mark.asyncio
 async def test_dsl_getinfo() -> None:
     """It exits with a status code of zero."""
     respx.get("http://192.168.0.1/api/1.0/?method=dsl.getInfo").respond(

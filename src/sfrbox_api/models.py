@@ -56,18 +56,20 @@ class DslInfo:
     """Débit flux descendant."""
     rate_up: int
     """Débit flux montant."""
-    line_status: str
+    line_status: Optional[str] = None
     """Etat détaillé du lien.
 
     = (No Defect|Of Frame|Loss Of Signal|Loss Of Power|Loss Of Signal Quality|Unknown)
-    (firmware >= 3.3.2)"""
-    training: str
+    (firmware >= 3.3.2)
+    Note: ne semble pas être disponible dans la box 8"""
+    training: Optional[str] = None
     """Etat de négociation avec le DSLAM.
 
     = (Idle|G.994 Training|G.992 Started|G.922 Channel Analysis|G.992 Message Exchange|
     G.993 Started|G.993 Channel Analysis|G.993 Message Exchange|Showtime|Unknown)
 
-    (firmware >= 3.3.2)"""
+    (firmware >= 3.3.2)
+    Note: ne semble pas être disponible dans la box 8"""
 
 
 @dataclass

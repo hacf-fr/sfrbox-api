@@ -1,4 +1,5 @@
 """SFR Box bridge."""
+
 from __future__ import annotations
 
 import logging
@@ -107,10 +108,15 @@ class SFRBox:
             response.text,
         )
         response.raise_for_status()
+        response_text: str = response.text
+        if "</firewall>" in response_text and "<dsl" in response_text:
+            # There is a bug in firmware 3DCM020200r015
+            response_text = response_text.replace("</firewall>", "/>")
+
         try:
-            element: XmlElement = DefusedElementTree.fromstring(response.text)
+            element: XmlElement = DefusedElementTree.fromstring(response_text)
         except Exception as exc:
-            raise SFRBoxError(f"Failed to parse response: {response.text}") from exc
+            raise SFRBoxError(f"Failed to parse response: {response_text}") from exc
         stat = element.get("stat", "")
         if (
             stat == "fail"
@@ -124,7 +130,7 @@ class SFRBox:
                 raise SFRBoxAuthenticationError(f"Api call failed: [{code}] {msg}")
             raise SFRBoxApiError(f"Api call failed: [{code}] {msg}")
         if stat != "ok":
-            raise SFRBoxError(f"Response was not ok: {response.text}")
+            raise SFRBoxError(f"Response was not ok: {response_text}")
         return element
 
     @_with_error_wrapping
