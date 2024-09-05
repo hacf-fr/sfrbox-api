@@ -205,7 +205,7 @@ async def test_system_getinfo_3_5_8() -> None:
 
 @respx.mock
 @pytest.mark.asyncio
-async def test_system_getinfo_3DCM020200r015() -> None:
+async def test_system_getinfo_3dcm020200r015() -> None:
     """It exits with a status code of zero."""
     respx.get("http://192.168.0.1/api/1.0/?method=system.getInfo").respond(
         text=_load_fixture("system.getInfo.3DCM020200r015.xml")
