@@ -131,7 +131,7 @@ class SystemInfo:
     """Tension de l'alimentation exprimé en mV.
 
     (firmware >= 3.5.0)"""
-    temperature: Optional[float] = None
+    temperature: Optional[Union[float, int]] = None
     """Température de la BOX exprimé en m°C.
 
     (firmware >= 3.5.0)
