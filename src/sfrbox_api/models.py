@@ -12,7 +12,9 @@ except ImportError:  # pragma: no cover
     from pydantic.dataclasses import dataclass  # type: ignore[no-redef]
 
 
-def _empty_to_none(v: Union[int, str, None]) -> Optional[Union[int, str, None]]:
+def _empty_to_none(
+    v: Union[float, int, str, None]
+) -> Optional[Union[float, int, str, None]]:
     return None if v == "" else v
 
 
