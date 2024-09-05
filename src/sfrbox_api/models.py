@@ -1,4 +1,5 @@
 """SFR Box models."""
+
 from typing import Optional
 from typing import Union
 
@@ -130,10 +131,12 @@ class SystemInfo:
     """Tension de l'alimentation exprimé en mV.
 
     (firmware >= 3.5.0)"""
-    temperature: Optional[int] = None
+    temperature: Optional[float] = None
     """Température de la BOX exprimé en m°C.
 
-    (firmware >= 3.5.0)"""
+    (firmware >= 3.5.0)
+    Note: il semblerait que la température de la BOX soit
+    exprimée en °C pour les box 8"""
     serial_number: Optional[str] = None
     """Numéro de série de l'IAD.
 

@@ -1,4 +1,5 @@
 """Test cases for the __main__ module."""
+
 import pathlib
 import re
 import time
@@ -199,6 +200,35 @@ async def test_system_getinfo_3_5_8() -> None:
             alimvoltage=12214,
             temperature=44699,
             serial_number=None,
+        )
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_system_getinfo_3DCM020200r015() -> None:
+    """It exits with a status code of zero."""
+    respx.get("http://192.168.0.1/api/1.0/?method=system.getInfo").respond(
+        text=_load_fixture("system.getInfo.3DCM020200r015.xml")
+    )
+    async with httpx.AsyncClient() as client:
+        box = SFRBox(ip="192.168.0.1", client=client)
+        info = await box.system_get_info()
+        assert info == SystemInfo(
+            product_id="ALGD1-UBE-r0",
+            mac_addr="***hidden***",
+            net_mode="router",
+            net_infra="fttb",
+            uptime=1563441,
+            version_mainfirmware="3DCM020200r015",
+            version_rescuefirmware="3DCM020200r015",
+            version_bootloader="3.00",
+            version_dsldriver="",
+            current_datetime="20240905130854",
+            refclient="",
+            idur="RNCUAOL",
+            alimvoltage=12251,
+            temperature=57.5,
+            serial_number="MU1B01140006020043",
         )
 
 
