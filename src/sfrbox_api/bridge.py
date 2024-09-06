@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 import time
 from functools import wraps
+from typing import TYPE_CHECKING
 from typing import Any
 from typing import Awaitable
 from typing import Callable
@@ -89,6 +90,8 @@ class SFRBox:
         if not (self._username and self._password):
             raise SFRBoxAuthenticationError("Credentials not set")
         element = await self._send_get("auth", "getToken")
+        if TYPE_CHECKING:
+            assert element is not None
         if (method := element.get("method")) not in {"all", "passwd"}:
             raise SFRBoxAuthenticationError(
                 f"Password authentication is not allowed, valid methods: `{method}`"
@@ -96,6 +99,8 @@ class SFRBox:
         token = element.get("token", "")
         hash = compute_hash(token, self._username, self._password)
         element = await self._send_get("auth", "checkToken", token=token, hash=hash)
+        if TYPE_CHECKING:
+            assert element is not None
         return element.get("token", "")
 
     def _check_response(self, response: httpx.Response) -> XmlElement:
@@ -174,7 +179,9 @@ class SFRBox:
         )
         self._check_response(response)
 
-    def _create_class(self, cls: type[_T], xml_response: XmlElement | None) -> _T:
+    def _create_class(
+        self, cls: type[_T], xml_response: XmlElement | None
+    ) -> _T | None:
         """Crée la classe."""
         if xml_response is None:
             return None
@@ -183,27 +190,27 @@ class SFRBox:
     async def dsl_get_info(self) -> DslInfo | None:
         """Renvoie les informations sur le lien ADSL."""
         xml_response = await self._send_get("dsl", "getInfo")
-        return DslInfo(**xml_response.attrib)  # type: ignore[arg-type]
+        return self._create_class(DslInfo, xml_response)
 
     async def ftth_get_info(self) -> FtthInfo | None:
         """Renvoie les informations sur le lien FTTH."""
         xml_response = await self._send_get("ftth", "getInfo")
         return self._create_class(FtthInfo, xml_response)
 
-    async def system_get_info(self) -> SystemInfo:
+    async def system_get_info(self) -> SystemInfo | None:
         """Renvoie les informations sur le système."""
         xml_response = await self._send_get("system", "getInfo")
-        return SystemInfo(**xml_response.attrib)  # type: ignore[arg-type]
+        return self._create_class(SystemInfo, xml_response)
 
     async def system_reboot(self) -> None:
         """Redémarrer la BOX."""
         token = await self._ensure_token()
         await self._send_post("system", "reboot", token=token)
 
-    async def wan_get_info(self) -> WanInfo:
+    async def wan_get_info(self) -> WanInfo | None:
         """Renvoie les informations génériques sur la connexion internet."""
         xml_response = await self._send_get("wan", "getInfo")
-        return WanInfo(**xml_response.attrib)  # type: ignore[arg-type]
+        return self._create_class(WanInfo, xml_response)
 
     async def wlan_get_client_list(self) -> WlanClientList:
         """Liste des clients WiFi."""
@@ -218,8 +225,11 @@ class SFRBox:
         """Renvoie les informations sur le WiFi."""
         token = await self._ensure_token()
         xml_response = await self._send_get("wlan", "getInfo", token=token)
+        if TYPE_CHECKING:
+            assert xml_response is not None
         wl0_element = xml_response.find("wl0")
-        assert wl0_element is not None  # noqa: S101
+        if TYPE_CHECKING:
+            assert wl0_element is not None
         wl0 = WlanWl0Info(**wl0_element.attrib)
         return WlanInfo(**xml_response.attrib, wl0=wl0)
 
