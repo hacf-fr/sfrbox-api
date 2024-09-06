@@ -90,8 +90,7 @@ class SFRBox:
         if not (self._username and self._password):
             raise SFRBoxAuthenticationError("Credentials not set")
         element = await self._send_get("auth", "getToken")
-        if TYPE_CHECKING:
-            assert element is not None
+        assert element is not None  # noqa: S101
         if (method := element.get("method")) not in {"all", "passwd"}:
             raise SFRBoxAuthenticationError(
                 f"Password authentication is not allowed, valid methods: `{method}`"
@@ -99,8 +98,7 @@ class SFRBox:
         token = element.get("token", "")
         hash = compute_hash(token, self._username, self._password)
         element = await self._send_get("auth", "checkToken", token=token, hash=hash)
-        if TYPE_CHECKING:
-            assert element is not None
+        assert element is not None  # noqa: S101
         return element.get("token", "")
 
     def _check_response(self, response: httpx.Response) -> XmlElement:
@@ -225,11 +223,9 @@ class SFRBox:
         """Renvoie les informations sur le WiFi."""
         token = await self._ensure_token()
         xml_response = await self._send_get("wlan", "getInfo", token=token)
-        if TYPE_CHECKING:
-            assert xml_response is not None
+        assert xml_response is not None  # noqa: S101
         wl0_element = xml_response.find("wl0")
-        if TYPE_CHECKING:
-            assert wl0_element is not None
+        assert wl0_element is not None  # noqa: S101
         wl0 = WlanWl0Info(**wl0_element.attrib)
         return WlanInfo(**xml_response.attrib, wl0=wl0)
 
