@@ -174,6 +174,19 @@ async def test_ftth_getinfo() -> None:
 
 @respx.mock
 @pytest.mark.asyncio
+async def test_ftth_getinfo_3dcm020200r015() -> None:
+    """It exits with a status code of zero."""
+    respx.get("http://192.168.0.1/api/1.0/?method=ftth.getInfo").respond(
+        text=_load_fixture("ftth.getInfo.3DCM020200r015.xml")
+    )
+    async with httpx.AsyncClient() as client:
+        box = SFRBox(ip="192.168.0.1", client=client)
+        info = await box.ftth_get_info()
+        assert info == None
+
+
+@respx.mock
+@pytest.mark.asyncio
 async def test_system_getinfo() -> None:
     """It exits with a status code of zero."""
     respx.get("http://192.168.0.1/api/1.0/?method=system.getInfo").respond(

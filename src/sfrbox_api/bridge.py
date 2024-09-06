@@ -143,10 +143,14 @@ class SFRBox:
         return element
 
     @_with_error_wrapping
-    async def _send_get(self, namespace: str, method: str, **kwargs: str) -> XmlElement:
+    async def _send_get(
+        self, namespace: str, method: str, **kwargs: str
+    ) -> XmlElement | None:
         params = httpx.QueryParams(method=f"{namespace}.{method}", **kwargs)
         response = await self._client.get(f"http://{self._ip}/api/1.0/", params=params)
         element = self._check_response(response)
+        if len(element) == 0:
+            return None
         result = element.find(namespace)
         if result is None:
             raise SFRBoxError(
@@ -174,9 +178,11 @@ class SFRBox:
         xml_response = await self._send_get("dsl", "getInfo")
         return DslInfo(**xml_response.attrib)  # type: ignore[arg-type]
 
-    async def ftth_get_info(self) -> FtthInfo:
+    async def ftth_get_info(self) -> FtthInfo | None:
         """Renvoie les informations sur le lien FTTH."""
         xml_response = await self._send_get("ftth", "getInfo")
+        if xml_response is None:
+            return None
         return FtthInfo(**xml_response.attrib)
 
     async def system_get_info(self) -> SystemInfo:
