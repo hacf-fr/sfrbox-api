@@ -182,7 +182,7 @@ async def test_ftth_getinfo_3dcm020200r015() -> None:
     async with httpx.AsyncClient() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         info = await box.ftth_get_info()
-        assert info == None
+        assert info is None
 
 
 @respx.mock
