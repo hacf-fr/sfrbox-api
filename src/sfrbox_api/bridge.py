@@ -1,4 +1,5 @@
 """SFR Box bridge."""
+
 from __future__ import annotations
 
 import logging
@@ -32,6 +33,7 @@ from .models import WlanWl0Info
 
 
 _LOGGER = logging.getLogger(__name__)
+_T = TypeVar("_T")
 _R = TypeVar("_R")
 _P = ParamSpec("_P")
 
@@ -87,6 +89,7 @@ class SFRBox:
         if not (self._username and self._password):
             raise SFRBoxAuthenticationError("Credentials not set")
         element = await self._send_get("auth", "getToken")
+        assert element is not None  # noqa: S101
         if (method := element.get("method")) not in {"all", "passwd"}:
             raise SFRBoxAuthenticationError(
                 f"Password authentication is not allowed, valid methods: `{method}`"
@@ -94,6 +97,7 @@ class SFRBox:
         token = element.get("token", "")
         hash = compute_hash(token, self._username, self._password)
         element = await self._send_get("auth", "checkToken", token=token, hash=hash)
+        assert element is not None  # noqa: S101
         return element.get("token", "")
 
     def _check_response(self, response: httpx.Response) -> XmlElement:
@@ -107,10 +111,15 @@ class SFRBox:
             response.text,
         )
         response.raise_for_status()
+        response_text: str = response.text
+        if "</firewall>" in response_text and "<dsl" in response_text:
+            # There is a bug in firmware 3DCM020200r015
+            response_text = response_text.replace("</firewall>", "/>")
+
         try:
-            element: XmlElement = DefusedElementTree.fromstring(response.text)
+            element: XmlElement = DefusedElementTree.fromstring(response_text)
         except Exception as exc:
-            raise SFRBoxError(f"Failed to parse response: {response.text}") from exc
+            raise SFRBoxError(f"Failed to parse response: {response_text}") from exc
         stat = element.get("stat", "")
         if (
             stat == "fail"
@@ -124,7 +133,7 @@ class SFRBox:
                 raise SFRBoxAuthenticationError(f"Api call failed: [{code}] {msg}")
             raise SFRBoxApiError(f"Api call failed: [{code}] {msg}")
         if stat != "ok":
-            raise SFRBoxError(f"Response was not ok: {response.text}")
+            raise SFRBoxError(f"Response was not ok: {response_text}")
         return element
 
     @_with_error_wrapping
@@ -137,10 +146,14 @@ class SFRBox:
         return element
 
     @_with_error_wrapping
-    async def _send_get(self, namespace: str, method: str, **kwargs: str) -> XmlElement:
+    async def _send_get(
+        self, namespace: str, method: str, **kwargs: str
+    ) -> XmlElement | None:
         params = httpx.QueryParams(method=f"{namespace}.{method}", **kwargs)
         response = await self._client.get(f"http://{self._ip}/api/1.0/", params=params)
         element = self._check_response(response)
+        if len(element) == 0:
+            return None
         result = element.find(namespace)
         if result is None:
             raise SFRBoxError(
@@ -163,30 +176,38 @@ class SFRBox:
         )
         self._check_response(response)
 
-    async def dsl_get_info(self) -> DslInfo:
+    def _create_class(
+        self, cls: type[_T], xml_response: XmlElement | None
+    ) -> _T | None:
+        """Crée la classe."""
+        if xml_response is None:
+            return None
+        return cls(**xml_response.attrib)
+
+    async def dsl_get_info(self) -> DslInfo | None:
         """Renvoie les informations sur le lien ADSL."""
         xml_response = await self._send_get("dsl", "getInfo")
-        return DslInfo(**xml_response.attrib)  # type: ignore[arg-type]
+        return self._create_class(DslInfo, xml_response)
 
-    async def ftth_get_info(self) -> FtthInfo:
+    async def ftth_get_info(self) -> FtthInfo | None:
         """Renvoie les informations sur le lien FTTH."""
         xml_response = await self._send_get("ftth", "getInfo")
-        return FtthInfo(**xml_response.attrib)
+        return self._create_class(FtthInfo, xml_response)
 
-    async def system_get_info(self) -> SystemInfo:
+    async def system_get_info(self) -> SystemInfo | None:
         """Renvoie les informations sur le système."""
         xml_response = await self._send_get("system", "getInfo")
-        return SystemInfo(**xml_response.attrib)  # type: ignore[arg-type]
+        return self._create_class(SystemInfo, xml_response)
 
     async def system_reboot(self) -> None:
         """Redémarrer la BOX."""
         token = await self._ensure_token()
         await self._send_post("system", "reboot", token=token)
 
-    async def wan_get_info(self) -> WanInfo:
+    async def wan_get_info(self) -> WanInfo | None:
         """Renvoie les informations génériques sur la connexion internet."""
         xml_response = await self._send_get("wan", "getInfo")
-        return WanInfo(**xml_response.attrib)  # type: ignore[arg-type]
+        return self._create_class(WanInfo, xml_response)
 
     async def wlan_get_client_list(self) -> WlanClientList:
         """Liste des clients WiFi."""
@@ -201,6 +222,7 @@ class SFRBox:
         """Renvoie les informations sur le WiFi."""
         token = await self._ensure_token()
         xml_response = await self._send_get("wlan", "getInfo", token=token)
+        assert xml_response is not None  # noqa: S101
         wl0_element = xml_response.find("wl0")
         assert wl0_element is not None  # noqa: S101
         wl0 = WlanWl0Info(**wl0_element.attrib)

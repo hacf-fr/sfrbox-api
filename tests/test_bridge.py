@@ -1,4 +1,5 @@
 """Test cases for the __main__ module."""
+
 import pathlib
 import re
 import time
@@ -106,6 +107,33 @@ async def test_authenticate_method_not_allowed() -> None:
 
 @respx.mock
 @pytest.mark.asyncio
+async def test_dsl_getinfo_3dcm020200r015() -> None:
+    """It exits with a status code of zero."""
+    respx.get("http://192.168.0.1/api/1.0/?method=dsl.getInfo").respond(
+        text=_load_fixture("dsl.getInfo.3DCM020200r015.xml")
+    )
+    async with httpx.AsyncClient() as client:
+        box = SFRBox(ip="192.168.0.1", client=client)
+        info = await box.dsl_get_info()
+        assert info == DslInfo(
+            linemode="G.DMT",
+            uptime=4857,
+            counter=1,
+            crc=0,
+            status="up",
+            noise_down=4.5,
+            noise_up=4.2,
+            attenuation_down=3.2,
+            attenuation_up=5.2,
+            rate_down=8000,
+            rate_up=800,
+            line_status=None,
+            training=None,
+        )
+
+
+@respx.mock
+@pytest.mark.asyncio
 async def test_dsl_getinfo() -> None:
     """It exits with a status code of zero."""
     respx.get("http://192.168.0.1/api/1.0/?method=dsl.getInfo").respond(
@@ -142,6 +170,19 @@ async def test_ftth_getinfo() -> None:
         box = SFRBox(ip="192.168.0.1", client=client)
         info = await box.ftth_get_info()
         assert info == FtthInfo(status="down", wanfibre="out")
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_ftth_getinfo_3dcm020200r015() -> None:
+    """It exits with a status code of zero."""
+    respx.get("http://192.168.0.1/api/1.0/?method=ftth.getInfo").respond(
+        text=_load_fixture("ftth.getInfo.3DCM020200r015.xml")
+    )
+    async with httpx.AsyncClient() as client:
+        box = SFRBox(ip="192.168.0.1", client=client)
+        info = await box.ftth_get_info()
+        assert info is None
 
 
 @respx.mock
@@ -199,6 +240,35 @@ async def test_system_getinfo_3_5_8() -> None:
             alimvoltage=12214,
             temperature=44699,
             serial_number=None,
+        )
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_system_getinfo_3dcm020200r015() -> None:
+    """It exits with a status code of zero."""
+    respx.get("http://192.168.0.1/api/1.0/?method=system.getInfo").respond(
+        text=_load_fixture("system.getInfo.3DCM020200r015.xml")
+    )
+    async with httpx.AsyncClient() as client:
+        box = SFRBox(ip="192.168.0.1", client=client)
+        info = await box.system_get_info()
+        assert info == SystemInfo(
+            product_id="ALGD1-UBE-r0",
+            mac_addr="***hidden***",
+            net_mode="router",
+            net_infra="fttb",
+            uptime=1563441,
+            version_mainfirmware="3DCM020200r015",
+            version_rescuefirmware="3DCM020200r015",
+            version_bootloader="3.00",
+            version_dsldriver="",
+            current_datetime="20240905130854",
+            refclient="",
+            idur="RNCUAOL",
+            alimvoltage=12251,
+            temperature=57.5,
+            serial_number="MU1B01140006020043",
         )
 
 

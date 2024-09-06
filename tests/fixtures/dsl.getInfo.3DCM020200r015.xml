@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rsp stat="ok" version="1.0">
+  <dsl linemode="G.DMT" uptime="4857" counter="1" crc="0" status="up" noise_down="4.5" noise_up="4.2" attenuation_down="3.2" attenuation_up="5.2" rate_down="8000" rate_up="800"
+  </firewall>
+</rsp>

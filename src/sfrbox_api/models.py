@@ -1,4 +1,5 @@
 """SFR Box models."""
+
 from typing import Optional
 from typing import Union
 
@@ -11,7 +12,9 @@ except ImportError:  # pragma: no cover
     from pydantic.dataclasses import dataclass  # type: ignore[no-redef]
 
 
-def _empty_to_none(v: Union[int, str, None]) -> Optional[Union[int, str, None]]:
+def _empty_to_none(
+    v: Union[float, int, str, None]
+) -> Optional[Union[float, int, str, None]]:
     return None if v == "" else v
 
 
@@ -53,18 +56,20 @@ class DslInfo:
     """Débit flux descendant."""
     rate_up: int
     """Débit flux montant."""
-    line_status: str
+    line_status: Optional[str] = None
     """Etat détaillé du lien.
 
     = (No Defect|Of Frame|Loss Of Signal|Loss Of Power|Loss Of Signal Quality|Unknown)
-    (firmware >= 3.3.2)"""
-    training: str
+    (firmware >= 3.3.2)
+    Note: ne semble pas être disponible dans la box 8"""
+    training: Optional[str] = None
     """Etat de négociation avec le DSLAM.
 
     = (Idle|G.994 Training|G.992 Started|G.922 Channel Analysis|G.992 Message Exchange|
     G.993 Started|G.993 Channel Analysis|G.993 Message Exchange|Showtime|Unknown)
 
-    (firmware >= 3.3.2)"""
+    (firmware >= 3.3.2)
+    Note: ne semble pas être disponible dans la box 8"""
 
 
 @dataclass
@@ -130,10 +135,12 @@ class SystemInfo:
     """Tension de l'alimentation exprimé en mV.
 
     (firmware >= 3.5.0)"""
-    temperature: Optional[int] = None
+    temperature: Optional[Union[float, int]] = None
     """Température de la BOX exprimé en m°C.
 
-    (firmware >= 3.5.0)"""
+    (firmware >= 3.5.0)
+    Note: il semblerait que la température de la BOX soit
+    exprimée en °C pour les box 8"""
     serial_number: Optional[str] = None
     """Numéro de série de l'IAD.
 
