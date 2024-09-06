@@ -173,7 +173,12 @@ class SFRBox:
         )
         self._check_response(response)
 
-    async def dsl_get_info(self) -> DslInfo:
+    def _create_class(self, cls: type[_T], xml_response: XmlElement | None) -> _T:
+        """Crée la classe."""
+        if xml_response is None:
+            return None
+        return cls(**xml_response.attrib)
+
         """Renvoie les informations sur le lien ADSL."""
         xml_response = await self._send_get("dsl", "getInfo")
         return DslInfo(**xml_response.attrib)  # type: ignore[arg-type]
@@ -181,9 +186,7 @@ class SFRBox:
     async def ftth_get_info(self) -> FtthInfo | None:
         """Renvoie les informations sur le lien FTTH."""
         xml_response = await self._send_get("ftth", "getInfo")
-        if xml_response is None:
-            return None
-        return FtthInfo(**xml_response.attrib)
+        return self._create_class(FtthInfo, xml_response)
 
     async def system_get_info(self) -> SystemInfo:
         """Renvoie les informations sur le système."""
