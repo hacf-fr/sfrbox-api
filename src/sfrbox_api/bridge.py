@@ -33,6 +33,7 @@ from .models import WlanWl0Info
 
 
 _LOGGER = logging.getLogger(__name__)
+_T = TypeVar("_T")
 _R = TypeVar("_R")
 _P = ParamSpec("_P")
 
@@ -179,6 +180,7 @@ class SFRBox:
             return None
         return cls(**xml_response.attrib)
 
+    async def dsl_get_info(self) -> DslInfo | None:
         """Renvoie les informations sur le lien ADSL."""
         xml_response = await self._send_get("dsl", "getInfo")
         return DslInfo(**xml_response.attrib)  # type: ignore[arg-type]
