@@ -5,7 +5,6 @@ from __future__ import annotations
 import logging
 import time
 from functools import wraps
-from typing import TYPE_CHECKING
 from typing import Any
 from typing import Awaitable
 from typing import Callable
