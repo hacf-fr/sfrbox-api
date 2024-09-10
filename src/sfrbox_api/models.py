@@ -14,7 +14,7 @@ except ImportError:  # pragma: no cover
 
 def _empty_to_none(
     v: Union[float, int, str, None]
-) -> Optional[Union[float, int, str, None]]:
+) -> Union[float, int, str, None]:
     return None if v == "" else v
 
 
@@ -135,7 +135,7 @@ class SystemInfo:
     """Tension de l'alimentation exprimé en mV.
 
     (firmware >= 3.5.0)"""
-    temperature: Optional[Union[float, int]] = None
+    temperature: Union[float, int, None] = None
     """Température de la BOX exprimé en m°C.
 
     (firmware >= 3.5.0)
