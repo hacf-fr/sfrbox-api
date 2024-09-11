@@ -96,7 +96,9 @@ def activate_virtualenv_in_precommit_hooks(session: Session) -> None:
         text = hook.read_text()
 
         if not any(
-            Path("A") == Path("a") and bindir.lower() in text.lower() or bindir in text
+            Path("A") == Path("a")
+            and bindir.lower() in text.lower()
+            or bindir in text
             for bindir in bindirs
         ):
             continue
@@ -120,7 +122,6 @@ def precommit(session: Session) -> None:
         "--show-diff-on-failure",
     ]
     session.install(
-        "black",
         "darglint",
         "pre-commit",
         "pre-commit-hooks",
@@ -148,16 +149,22 @@ def mypy(session: Session) -> None:
     session.install("mypy", "pytest", "respx")
     session.run("mypy", *args)
     if not session.posargs:
-        session.run("mypy", f"--python-executable={sys.executable}", "noxfile.py")
+        session.run(
+            "mypy", f"--python-executable={sys.executable}", "noxfile.py"
+        )
 
 
 @session(python=python_versions)
 def tests(session: Session) -> None:
     """Run the test suite."""
     session.install(".[cli]")
-    session.install("coverage[toml]", "pytest", "pygments", "pytest-asyncio", "respx")
+    session.install(
+        "coverage[toml]", "pytest", "pygments", "pytest-asyncio", "respx"
+    )
     try:
-        session.run("coverage", "run", "--parallel", "-m", "pytest", *session.posargs)
+        session.run(
+            "coverage", "run", "--parallel", "-m", "pytest", *session.posargs
+        )
     finally:
         if session.interactive:
             session.notify("coverage", posargs=[])
@@ -180,7 +187,9 @@ def coverage(session: Session) -> None:
 def typeguard(session: Session) -> None:
     """Runtime type checking using Typeguard."""
     session.install(".[cli]")
-    session.install("pytest", "typeguard", "pygments", "pytest-asyncio", "respx")
+    session.install(
+        "pytest", "typeguard", "pygments", "pytest-asyncio", "respx"
+    )
     session.run("pytest", f"--typeguard-packages={package}", *session.posargs)
 
 
@@ -221,7 +230,9 @@ def docs(session: Session) -> None:
     """Build and serve the documentation with live reloading on file changes."""
     args = session.posargs or ["--open-browser", "docs", "docs/_build"]
     session.install(".")
-    session.install("sphinx", "sphinx-autobuild", "sphinx-click", "furo", "myst-parser")
+    session.install(
+        "sphinx", "sphinx-autobuild", "sphinx-click", "furo", "myst-parser"
+    )
 
     build_dir = Path("docs", "_build")
     if build_dir.exists():
