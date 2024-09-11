@@ -1,4 +1,5 @@
 """Sphinx configuration."""
+
 project = "SFR Box API"
 author = "epenet"
 copyright = "2022, epenet"
