@@ -33,6 +33,12 @@ repos:
         language: system
         types: [text]
         stages: [commit, push, manual]
+      - id: ruff-check
+        name: Lint code with Ruff
+        entry: ruff check
+        language: system
+        types: [python]
+        require_serial: true
       - id: pyupgrade
         name: pyupgrade
         description: Automatically upgrade syntax for newer versions.
