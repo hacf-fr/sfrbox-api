@@ -38,7 +38,7 @@ _P = ParamSpec("_P")
 
 
 def _with_error_wrapping(
-    func: Callable[_P, Awaitable[_R]]
+    func: Callable[_P, Awaitable[_R]],
 ) -> Callable[_P, Coroutine[Any, Any, _R]]:
     """Catch httpx errors."""
 
@@ -69,7 +69,9 @@ class SFRBox:
         self._ip = ip
         self._client = client
 
-    async def authenticate(self, *, username: str = "admin", password: str) -> None:
+    async def authenticate(
+        self, *, username: str = "admin", password: str
+    ) -> None:
         """Initialise le token pour pouvoir accéder aux méthodes privées de l'API."""
         self._username = username
         self._password = password
@@ -95,7 +97,9 @@ class SFRBox:
             )
         token = element.get("token", "")
         hash = compute_hash(token, self._username, self._password)
-        element = await self._send_get("auth", "checkToken", token=token, hash=hash)
+        element = await self._send_get(
+            "auth", "checkToken", token=token, hash=hash
+        )
         assert element is not None  # noqa: S101
         return element.get("token", "")
 
@@ -118,7 +122,9 @@ class SFRBox:
         try:
             element: XmlElement = DefusedElementTree.fromstring(response_text)
         except Exception as exc:
-            raise SFRBoxError(f"Failed to parse response: {response_text}") from exc
+            raise SFRBoxError(
+                f"Failed to parse response: {response_text}"
+            ) from exc
         stat = element.get("stat", "")
         if (
             stat == "fail"
@@ -129,7 +135,9 @@ class SFRBox:
             if code in {"115", "204", "901"}:
                 # Reset token on auth failure
                 self._token = None
-                raise SFRBoxAuthenticationError(f"Api call failed: [{code}] {msg}")
+                raise SFRBoxAuthenticationError(
+                    f"Api call failed: [{code}] {msg}"
+                )
             raise SFRBoxApiError(f"Api call failed: [{code}] {msg}")
         if stat != "ok":
             raise SFRBoxError(f"Response was not ok: {response_text}")
@@ -140,7 +148,9 @@ class SFRBox:
         self, namespace: str, method: str, **kwargs: str
     ) -> XmlElement:
         params = httpx.QueryParams(method=f"{namespace}.{method}", **kwargs)
-        response = await self._client.get(f"http://{self._ip}/api/1.0/", params=params)
+        response = await self._client.get(
+            f"http://{self._ip}/api/1.0/", params=params
+        )
         element = self._check_response(response)
         return element
 
@@ -149,7 +159,9 @@ class SFRBox:
         self, namespace: str, method: str, **kwargs: str
     ) -> XmlElement | None:
         params = httpx.QueryParams(method=f"{namespace}.{method}", **kwargs)
-        response = await self._client.get(f"http://{self._ip}/api/1.0/", params=params)
+        response = await self._client.get(
+            f"http://{self._ip}/api/1.0/", params=params
+        )
         element = self._check_response(response)
         if len(element) == 0:
             return None
@@ -211,10 +223,14 @@ class SFRBox:
     async def wlan_get_client_list(self) -> WlanClientList:
         """Liste des clients WiFi."""
         token = await self._ensure_token()
-        xml_response = await self._send_get_simple("wlan", "getClientList", token=token)
+        xml_response = await self._send_get_simple(
+            "wlan", "getClientList", token=token
+        )
         client_elements = xml_response.findall("client")
         return WlanClientList(
-            clients=[WlanClient(**element.attrib) for element in client_elements]
+            clients=[
+                WlanClient(**element.attrib) for element in client_elements
+            ]
         )
 
     async def wlan_get_info(self) -> WlanInfo:

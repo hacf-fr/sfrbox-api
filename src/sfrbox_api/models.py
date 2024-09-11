@@ -12,7 +12,7 @@ except ImportError:  # pragma: no cover
 
 
 def _empty_to_none(
-    v: Union[float, int, str, None]
+    v: Union[float, int, str, None],
 ) -> Optional[Union[float, int, str, None]]:
     return None if v == "" else v
 
@@ -22,7 +22,9 @@ class DslInfo:
     """Informations sur le lien ADSL."""
 
     # validators
-    _empty_to_none = validator("uptime", pre=True, allow_reuse=True)(_empty_to_none)
+    _empty_to_none = validator("uptime", pre=True, allow_reuse=True)(
+        _empty_to_none
+    )
 
     linemode: str
     """Mode du lien.
