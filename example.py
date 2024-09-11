@@ -1,4 +1,5 @@
 """Sample interation with SFRBox."""
+
 from __future__ import annotations
 
 import asyncio
@@ -8,7 +9,6 @@ import os
 import httpx
 
 from sfrbox_api.bridge import SFRBox
-
 
 username: str = os.environ.get("SFRBOX_USERNAME", "admin")
 password: str | None = os.environ.get("SFRBOX_PASSWORD")

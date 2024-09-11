@@ -3,7 +3,6 @@
 from typing import Optional
 from typing import Union
 
-
 try:
     from pydantic.v1 import validator
     from pydantic.v1.dataclasses import dataclass

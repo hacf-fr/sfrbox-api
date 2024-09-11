@@ -31,7 +31,6 @@ from .models import WlanClientList
 from .models import WlanInfo
 from .models import WlanWl0Info
 
-
 _LOGGER = logging.getLogger(__name__)
 _T = TypeVar("_T")
 _R = TypeVar("_R")
