@@ -1,30 +1,15 @@
 """SFR Box models."""
 
+from dataclasses import dataclass
 from typing import Optional
 from typing import Union
 
-try:
-    from pydantic.v1 import validator
-    from pydantic.v1.dataclasses import dataclass
-except ImportError:  # pragma: no cover
-    from pydantic import validator  # type: ignore[assignment]
-    from pydantic.dataclasses import dataclass  # type: ignore[no-redef]
-
-
-def _empty_to_none(
-    v: Union[float, int, str, None],
-) -> Optional[Union[float, int, str, None]]:
-    return None if v == "" else v
+from mashumaro import DataClassDictMixin
 
 
 @dataclass
-class DslInfo:
+class DslInfo(DataClassDictMixin):
     """Informations sur le lien ADSL."""
-
-    # validators
-    _empty_to_none = validator("uptime", pre=True, allow_reuse=True)(
-        _empty_to_none
-    )
 
     linemode: str
     """Mode du lien.
@@ -74,7 +59,7 @@ class DslInfo:
 
 
 @dataclass
-class FtthInfo:
+class FtthInfo(DataClassDictMixin):
     """Informations sur le lien FTTH."""
 
     status: str
@@ -92,13 +77,8 @@ class FtthInfo:
 
 
 @dataclass
-class SystemInfo:
+class SystemInfo(DataClassDictMixin):
     """Informations système."""
-
-    # validators
-    _empty_to_none = validator(
-        "alimvoltage", "temperature", pre=True, allow_reuse=True
-    )(_empty_to_none)
 
     product_id: str
     """L'ID du produit: $(NB)-$(HARD)-$(HARD_VERSION)."""
@@ -149,13 +129,8 @@ class SystemInfo:
 
 
 @dataclass
-class WanInfo:
+class WanInfo(DataClassDictMixin):
     """Informations génériques sur la connexion internet."""
-
-    # validators
-    _empty_to_none = validator("uptime", "uptime6", pre=True, allow_reuse=True)(
-        _empty_to_none
-    )
 
     status: str
     """Status de la connexion internet.
@@ -202,7 +177,7 @@ class WanInfo:
 
 
 @dataclass
-class WlanClient:
+class WlanClient(DataClassDictMixin):
     """Client WiFi."""
 
     mac_addr: str
@@ -212,7 +187,7 @@ class WlanClient:
 
 
 @dataclass
-class WlanClientList:
+class WlanClientList(DataClassDictMixin):
     """Liste des clients WiFi."""
 
     clients: "list[WlanClient]"
@@ -220,7 +195,7 @@ class WlanClientList:
 
 
 @dataclass
-class WlanWl0Info:
+class WlanWl0Info(DataClassDictMixin):
     """Informations sur le WiFi."""
 
     ssid: str
@@ -248,7 +223,7 @@ class WlanWl0Info:
 
 
 @dataclass
-class WlanInfo:
+class WlanInfo(DataClassDictMixin):
     """Informations sur le WiFi."""
 
     active: str
