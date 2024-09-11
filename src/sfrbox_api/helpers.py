@@ -1,4 +1,5 @@
 """SFR Box helpers."""
+
 import hashlib
 import hmac
 

@@ -1,4 +1,5 @@
 """Test cases for the __main__ module."""
+
 from sfrbox_api.helpers import compute_hash
 
 
