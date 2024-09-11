@@ -197,7 +197,7 @@ class SFRBox:
         """Crée la classe."""
         if xml_response is None:
             return None
-        kwargs = {**xml_response.attrib}
+        kwargs: dict[str, Any] = {**xml_response.attrib}
         if empty_to_none is not None:
             for k in empty_to_none:
                 if k in kwargs and kwargs[k] == "":
