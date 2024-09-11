@@ -15,6 +15,7 @@ from xml.etree.ElementTree import Element as XmlElement  # noqa: S405
 
 import defusedxml.ElementTree as DefusedElementTree
 import httpx
+from mashumaro import DataClassDictMixin
 from typing_extensions import ParamSpec
 
 from sfrbox_api.helpers import compute_hash
@@ -32,7 +33,7 @@ from .models import WlanInfo
 from .models import WlanWl0Info
 
 _LOGGER = logging.getLogger(__name__)
-_T = TypeVar("_T")
+_T = TypeVar("_T", bound=DataClassDictMixin)
 _R = TypeVar("_R")
 _P = ParamSpec("_P")
 
@@ -188,17 +189,25 @@ class SFRBox:
         self._check_response(response)
 
     def _create_class(
-        self, cls: type[_T], xml_response: XmlElement | None
+        self,
+        cls: type[_T],
+        xml_response: XmlElement | None,
+        empty_to_none: set[str] | None = None,
     ) -> _T | None:
         """Crée la classe."""
         if xml_response is None:
             return None
-        return cls(**xml_response.attrib)
+        kwargs = {**xml_response.attrib}
+        if empty_to_none is not None:
+            for k in empty_to_none:
+                if k in kwargs and kwargs[k] == "":
+                    kwargs[k] = None
+        return cls.from_dict(kwargs)
 
     async def dsl_get_info(self) -> DslInfo | None:
         """Renvoie les informations sur le lien ADSL."""
         xml_response = await self._send_get("dsl", "getInfo")
-        return self._create_class(DslInfo, xml_response)
+        return self._create_class(DslInfo, xml_response, {"uptime"})
 
     async def ftth_get_info(self) -> FtthInfo | None:
         """Renvoie les informations sur le lien FTTH."""
@@ -208,7 +217,9 @@ class SFRBox:
     async def system_get_info(self) -> SystemInfo | None:
         """Renvoie les informations sur le système."""
         xml_response = await self._send_get("system", "getInfo")
-        return self._create_class(SystemInfo, xml_response)
+        return self._create_class(
+            SystemInfo, xml_response, {"alimvoltage", "temperature"}
+        )
 
     async def system_reboot(self) -> None:
         """Redémarrer la BOX."""
@@ -218,7 +229,7 @@ class SFRBox:
     async def wan_get_info(self) -> WanInfo | None:
         """Renvoie les informations génériques sur la connexion internet."""
         xml_response = await self._send_get("wan", "getInfo")
-        return self._create_class(WanInfo, xml_response)
+        return self._create_class(WanInfo, xml_response, {"uptime", "uptime6"})
 
     async def wlan_get_client_list(self) -> WlanClientList:
         """Liste des clients WiFi."""
