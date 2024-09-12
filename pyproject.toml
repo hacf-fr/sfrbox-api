@@ -30,6 +30,8 @@ httpx = ">=0.23.1"
 defusedxml = ">=0.7.1"
 mashumaro = ">=3.13.1"
 click = { version = ">=8.0.1", optional = true }
+#ensure anyio (for httpx) is greater than 4.4.0 for PVE-2024-71199
+anyio = ">=4.4.0"
 
 [tool.poetry.dev-dependencies]
 Pygments = ">=2.10.0"
