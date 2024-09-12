@@ -1,8 +1,8 @@
 """SFR Box models."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass
-from typing import Optional
-from typing import Union
 
 from mashumaro import DataClassDictMixin
 
@@ -14,7 +14,7 @@ class DslInfo(DataClassDictMixin):
     linemode: str
     """Mode du lien.
     (firmware >= 2.1.2)"""
-    uptime: Optional[int]
+    uptime: int | None
     """Nombre de seconde depuis la montée du lien.
 
     (firmware >= 2.1.2)"""
@@ -42,13 +42,13 @@ class DslInfo(DataClassDictMixin):
     """Débit flux descendant."""
     rate_up: int
     """Débit flux montant."""
-    line_status: Optional[str] = None
+    line_status: str | None = None
     """Etat détaillé du lien.
 
     = (No Defect|Of Frame|Loss Of Signal|Loss Of Power|Loss Of Signal Quality|Unknown)
     (firmware >= 3.3.2)
     Note: ne semble pas être disponible dans la box 8"""
-    training: Optional[str] = None
+    training: str | None = None
     """Etat de négociation avec le DSLAM.
 
     = (Idle|G.994 Training|G.992 Started|G.922 Channel Analysis|G.992 Message Exchange|
@@ -100,29 +100,29 @@ class SystemInfo(DataClassDictMixin):
     """(indisponible sur NB5)
 
     (firmware >= 2.1.2)"""
-    current_datetime: Optional[str] = None
+    current_datetime: str | None = None
     """Date actuelle sous le format : "%Y%m%d%H%M".
 
     (firmware >= 3.2.0)"""
-    refclient: Optional[str] = None
+    refclient: str | None = None
     """Référence client.
 
     (firmware >= 3.2.0)"""
-    idur: Optional[str] = None
+    idur: str | None = None
     """Identifiant unique réseau.
 
     (firmware >= 3.4.0)"""
-    alimvoltage: Optional[int] = None
+    alimvoltage: int | None = None
     """Tension de l'alimentation exprimé en mV.
 
     (firmware >= 3.5.0)"""
-    temperature: Optional[Union[float, int]] = None
+    temperature: int | float | None = None
     """Température de la BOX exprimé en m°C.
 
     (firmware >= 3.5.0)
     Note: il semblerait que la température de la BOX soit
     exprimée en °C pour les box 8"""
-    serial_number: Optional[str] = None
+    serial_number: str | None = None
     """Numéro de série de l'IAD.
 
     (firmware >= 4.0.0)"""
@@ -136,7 +136,7 @@ class WanInfo(DataClassDictMixin):
     """Status de la connexion internet.
 
     = (up|down)"""
-    uptime: Optional[int]
+    uptime: int | None
     """Temps de connexion internet v4 ou v6 (suivant les cas)"""
     ip_addr: str
     """Adresse IPv4 internet.
@@ -166,7 +166,7 @@ class WanInfo(DataClassDictMixin):
     = (up|down)
 
     (firmware >= 3.4)"""
-    uptime6: Optional[int]
+    uptime6: int | None
     """Temps de connexion internet IPv6.
 
     (firmware >= 3.4)"""
@@ -190,7 +190,7 @@ class WlanClient(DataClassDictMixin):
 class WlanClientList(DataClassDictMixin):
     """Liste des clients WiFi."""
 
-    clients: "list[WlanClient]"
+    clients: list[WlanClient]
     """Liste des clients WiFi."""
 
 
@@ -208,13 +208,13 @@ class WlanWl0Info(DataClassDictMixin):
     """Clé WPA."""
     wepkey: str
     """Clé WEP primaire."""
-    enc: Optional[str] = None
+    enc: str | None = None
     """Encryption.
 
     = (OPEN|WEP|WPA-PSK|WPA2-PSK|WPA-WPA2-PSK)
 
     (firmware >= 2.1)"""
-    enctype: Optional[str] = None
+    enctype: str | None = None
     """Type de clé WPA.
 
     = (tkip|aes|tkipaes)
@@ -238,7 +238,7 @@ class WlanInfo(DataClassDictMixin):
     = (auto|11b|11g|11n|11ng)"""
     wl0: WlanWl0Info
     """"""
-    mac_filtering: Optional[str] = None
+    mac_filtering: str | None = None
     """Activation du filtrage mac.
 
     = (whitelist|blacklist|off)
