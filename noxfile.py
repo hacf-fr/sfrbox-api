@@ -125,7 +125,6 @@ def precommit(session: Session) -> None:
         "darglint",
         "pre-commit",
         "pre-commit-hooks",
-        "pyupgrade",
         "ruff",
     )
     session.run("pre-commit", *args)
