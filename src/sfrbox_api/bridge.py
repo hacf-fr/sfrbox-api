@@ -67,7 +67,10 @@ class SFRBox:
 
     def __init__(self, *, ip: str, client: httpx.AsyncClient) -> None:
         """Initialise SFR Box bridge."""
-        self._ip = ip
+        if ip.startswith("http://") or ip.startswith("https://"):
+            self._url = ip
+        else:
+            self._url = f"http://{ip}"
         self._client = client
 
     async def authenticate(
@@ -150,7 +153,7 @@ class SFRBox:
     ) -> XmlElement:
         params = httpx.QueryParams(method=f"{namespace}.{method}", **kwargs)
         response = await self._client.get(
-            f"http://{self._ip}/api/1.0/", params=params
+            f"{self._url}/api/1.0/", params=params
         )
         element = self._check_response(response)
         return element
@@ -161,7 +164,7 @@ class SFRBox:
     ) -> XmlElement | None:
         params = httpx.QueryParams(method=f"{namespace}.{method}", **kwargs)
         response = await self._client.get(
-            f"http://{self._ip}/api/1.0/", params=params
+            f"{self._url}/api/1.0/", params=params
         )
         element = self._check_response(response)
         if len(element) == 0:
@@ -184,7 +187,7 @@ class SFRBox:
     ) -> None:
         params = httpx.QueryParams(method=f"{namespace}.{method}", token=token)
         response = await self._client.post(
-            f"http://{self._ip}/api/1.0/", params=params, data=data
+            f"{self._url}/api/1.0/", params=params, data=data
         )
         self._check_response(response)
 
