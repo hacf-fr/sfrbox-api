@@ -25,7 +25,7 @@ classifiers = [
 Changelog = "https://github.com/hacf-fr/sfrbox-api/releases"
 
 [tool.poetry.dependencies]
-python = ">=3.9,<4.0"
+python = ">=3.9.2,<4.0" # 3.9.0, 3.9.1 have issues with cryptography https://github.com/pyca/cryptography/pull/12045
 httpx = ">=0.23.1"
 defusedxml = ">=0.7.1"
 mashumaro = ">=3.13.1"
