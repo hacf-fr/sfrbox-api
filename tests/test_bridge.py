@@ -115,7 +115,9 @@ async def test_authenticate_method_not_allowed() -> None:
 @pytest.mark.asyncio
 async def test_authenticate_method_not_allowed_domain() -> None:
     """It exits with a status code of zero."""
-    respx.get("http://sfrbox.example.com/api/1.0/?method=auth.getToken").respond(
+    respx.get(
+        "http://sfrbox.example.com/api/1.0/?method=auth.getToken"
+    ).respond(
         text=_load_fixture("auth.getToken.xml").replace('"all"', '"button"')
     )
     async with httpx.AsyncClient() as client:
@@ -131,7 +133,9 @@ async def test_authenticate_method_not_allowed_domain() -> None:
 @pytest.mark.asyncio
 async def test_authenticate_method_not_allowed_domain_and_path() -> None:
     """It exits with a status code of zero."""
-    respx.get("http://example.com/sfrbox/api/1.0/?method=auth.getToken").respond(
+    respx.get(
+        "http://example.com/sfrbox/api/1.0/?method=auth.getToken"
+    ).respond(
         text=_load_fixture("auth.getToken.xml").replace('"all"', '"button"')
     )
     async with httpx.AsyncClient() as client:
@@ -147,7 +151,9 @@ async def test_authenticate_method_not_allowed_domain_and_path() -> None:
 @pytest.mark.asyncio
 async def test_authenticate_method_not_allowed_https_and_domain() -> None:
     """It exits with a status code of zero."""
-    respx.get("https://sfrbox.example.com/api/1.0/?method=auth.getToken").respond(
+    respx.get(
+        "https://sfrbox.example.com/api/1.0/?method=auth.getToken"
+    ).respond(
         text=_load_fixture("auth.getToken.xml").replace('"all"', '"button"')
     )
     async with httpx.AsyncClient() as client:
