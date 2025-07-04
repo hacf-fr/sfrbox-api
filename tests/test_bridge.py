@@ -113,6 +113,60 @@ async def test_authenticate_method_not_allowed() -> None:
 
 @respx.mock
 @pytest.mark.asyncio
+async def test_authenticate_method_not_allowed_domain() -> None:
+    """It exits with a status code of zero."""
+    respx.get(
+        "http://sfrbox.example.com/api/1.0/?method=auth.getToken"
+    ).respond(
+        text=_load_fixture("auth.getToken.xml").replace('"all"', '"button"')
+    )
+    async with httpx.AsyncClient() as client:
+        box = SFRBox(ip="http://sfrbox.example.com", client=client)
+        with pytest.raises(
+            SFRBoxAuthenticationError,
+            match="Password authentication is not allowed, valid methods: `button`",
+        ):
+            await box.authenticate(password="password")  # noqa: S106
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_authenticate_method_not_allowed_domain_and_path() -> None:
+    """It exits with a status code of zero."""
+    respx.get(
+        "http://example.com/sfrbox/api/1.0/?method=auth.getToken"
+    ).respond(
+        text=_load_fixture("auth.getToken.xml").replace('"all"', '"button"')
+    )
+    async with httpx.AsyncClient() as client:
+        box = SFRBox(ip="http://example.com/sfrbox", client=client)
+        with pytest.raises(
+            SFRBoxAuthenticationError,
+            match="Password authentication is not allowed, valid methods: `button`",
+        ):
+            await box.authenticate(password="password")  # noqa: S106
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_authenticate_method_not_allowed_https_and_domain() -> None:
+    """It exits with a status code of zero."""
+    respx.get(
+        "https://sfrbox.example.com/api/1.0/?method=auth.getToken"
+    ).respond(
+        text=_load_fixture("auth.getToken.xml").replace('"all"', '"button"')
+    )
+    async with httpx.AsyncClient() as client:
+        box = SFRBox(ip="https://sfrbox.example.com", client=client)
+        with pytest.raises(
+            SFRBoxAuthenticationError,
+            match="Password authentication is not allowed, valid methods: `button`",
+        ):
+            await box.authenticate(password="password")  # noqa: S106
+
+
+@respx.mock
+@pytest.mark.asyncio
 async def test_dsl_getinfo_3dcm020200r015() -> None:
     """It exits with a status code of zero."""
     respx.get("http://192.168.0.1/api/1.0/?method=dsl.getInfo").respond(
