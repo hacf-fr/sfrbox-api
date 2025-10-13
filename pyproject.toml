@@ -34,7 +34,7 @@ click = { version = ">=8.0.1", optional = true }
 #ensure anyio (for httpx) is greater than 4.4.0 for PVE-2024-71199
 anyio = ">=4.4.0"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 Pygments = ">=2.10.0"
 ruff = ">=0.3.7"
 coverage = {extras = ["toml"], version = ">=6.2"}
