@@ -5,11 +5,11 @@ from __future__ import annotations
 import logging
 import time
 from collections.abc import Awaitable
+from collections.abc import Callable
 from collections.abc import Coroutine
 from collections.abc import Mapping
 from functools import wraps
 from typing import Any
-from typing import Callable
 from typing import TypeVar
 from xml.etree.ElementTree import Element as XmlElement  # noqa: S405
 
