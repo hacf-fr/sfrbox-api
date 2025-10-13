@@ -58,7 +58,6 @@ jobs:
       - name: Compute pre-commit cache key
         if: matrix.session == 'pre-commit'
         id: pre-commit-cache
-        shell: python
         run: |
           echo "result=${{ runner.os }}-$(python --version | cut -d ' ' -f 2)" >> $GITHUB_OUTPUT
 
