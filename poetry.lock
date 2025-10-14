@@ -1091,18 +1091,18 @@ yaml = ["pyyaml (>=3.13)"]
 
 [[package]]
 name = "mdit-py-plugins"
-version = "0.4.2"
+version = "0.5.0"
 description = "Collection of plugins for markdown-it-py"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.10"
 groups = ["dev"]
 files = [
-    {file = "mdit_py_plugins-0.4.2-py3-none-any.whl", hash = "sha256:0c673c3f889399a33b95e88d2f0d111b4447bdfea7f237dab2d488f459835636"},
-    {file = "mdit_py_plugins-0.4.2.tar.gz", hash = "sha256:5f2cd1fdb606ddf152d37ec30e46101a60512bc0e5fa1a7002c36647b09e26b5"},
+    {file = "mdit_py_plugins-0.5.0-py3-none-any.whl", hash = "sha256:07a08422fc1936a5d26d146759e9155ea466e842f5ab2f7d2266dd084c8dab1f"},
+    {file = "mdit_py_plugins-0.5.0.tar.gz", hash = "sha256:f4918cb50119f50446560513a8e311d574ff6aaed72606ddae6d35716fe809c6"},
 ]
 
 [package.dependencies]
-markdown-it-py = ">=1.0.0,<4.0.0"
+markdown-it-py = ">=2.0.0,<5.0.0"
 
 [package.extras]
 code-style = ["pre-commit"]
