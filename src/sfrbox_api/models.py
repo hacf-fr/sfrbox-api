@@ -110,16 +110,21 @@ class SystemInfo(DataClassDictMixin):
     """Identifiant unique réseau.
 
     (firmware >= 3.4.0)"""
-    alimvoltage: int | None = None
+    alimvoltage: float | int | None = None
+
     """Tension de l'alimentation exprimé en mV.
 
-    (firmware >= 3.5.0)"""
+    (firmware >= 3.5.0)
+    Note: il semblerait que la température de la BOX soit
+    exprimée en V pour les box 10"""
+
     temperature: float | int | None = None
     """Température de la BOX exprimé en m°C.
 
     (firmware >= 3.5.0)
     Note: il semblerait que la température de la BOX soit
     exprimée en °C pour les box 8"""
+
     serial_number: str | None = None
     """Numéro de série de l'IAD.
 

@@ -334,6 +334,35 @@ async def test_system_getinfo_3dcm020200r015() -> None:
 
 @respx.mock
 @pytest.mark.asyncio
+async def test_system_getinfo_box10h_xbsp_1_6_14_1() -> None:
+    """It exits with a status code of zero."""
+    respx.get("http://192.168.0.1/api/1.0/?method=system.getInfo").respond(
+        text=_load_fixture("system.getInfo.BOX10H-XbSP-1.6.14.1.xml")
+    )
+    async with httpx.AsyncClient() as client:
+        box = SFRBox(ip="192.168.0.1", client=client)
+        info = await box.system_get_info()
+        assert info == SystemInfo(
+            product_id="BOX10H-SER-r0",
+            mac_addr="6C:61:F4:xxxxxx",
+            net_mode="router",
+            net_infra="ftth",
+            uptime=5334,
+            version_mainfirmware="BOX10H-XbSP-1.6.14.1",
+            version_rescuefirmware="BOX10H-XbSP-1.2.40",
+            version_bootloader="U-Boot2019.07(09/22/2025-17:42:41+0200)50404p3@510198",
+            version_dsldriver="",
+            current_datetime="20251024160207",
+            refclient="",
+            idur="RQE9SIU",
+            alimvoltage=0.0,
+            temperature=48.5,
+            serial_number="CS1A0530006xxxxxxx",
+        )
+
+
+@respx.mock
+@pytest.mark.asyncio
 async def test_system_reboot() -> None:
     """It exits with a status code of zero."""
     respx.post(
