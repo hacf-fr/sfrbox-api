@@ -4,9 +4,9 @@ import pathlib
 import re
 import time
 
-import httpx
+import aiohttp
 import pytest
-import respx
+from aioresponses import aioresponses
 
 from sfrbox_api.bridge import SFRBox
 from sfrbox_api.exceptions import SFRBoxApiError
@@ -28,20 +28,21 @@ def _load_fixture(filename: str) -> str:
     )
 
 
-@respx.mock
 @pytest.mark.asyncio
-async def test_authenticate() -> None:
+async def test_authenticate(mocked_responses: aioresponses) -> None:
     """It exits with a status code of zero."""
-    respx.get("http://192.168.0.1/api/1.0/?method=auth.getToken").respond(
-        text=_load_fixture("auth.getToken.xml")
+    mocked_responses.get(
+        "http://192.168.0.1/api/1.0/?method=auth.getToken",
+        body=_load_fixture("auth.getToken.xml"),
     )
-    respx.get(
+    mocked_responses.get(
         "http://192.168.0.1/api/1.0/?method=auth.checkToken"
         "&token=afd1baa4cb261bfc08ec2dc0ade3b4"
         "&hash=3e89f9170f9e64e5132aa6f72a520ffd45f952f259872a60e9acde5dba45ff64"
-        "88cc72099f52b8414e5b182b8e1c2b4b87863bd67b0134904adfe00ae6c6499e"
-    ).respond(text=_load_fixture("auth.checkToken.xml"))
-    async with httpx.AsyncClient() as client:
+        "88cc72099f52b8414e5b182b8e1c2b4b87863bd67b0134904adfe00ae6c6499e",
+        body=_load_fixture("auth.checkToken.xml"),
+    )
+    async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         await box.authenticate(password="password")  # noqa: S106
 
@@ -50,25 +51,28 @@ async def test_authenticate() -> None:
         assert box._token == "afd1baa4cb261bfc08ec2dc0ade3b4"  # noqa: S105
 
         # Ensure subsequent calls return existing token
-        respx.clear()
+        mocked_responses.clear()
         assert await box._ensure_token() == "afd1baa4cb261bfc08ec2dc0ade3b4"
 
 
-@respx.mock
 @pytest.mark.asyncio
-async def test_authenticate_invalid_password() -> None:
+async def test_authenticate_invalid_password(
+    mocked_responses: aioresponses,
+) -> None:
     """It exits with a status code of zero."""
-    respx.get("http://192.168.0.1/api/1.0/?method=auth.getToken").respond(
-        text=_load_fixture("auth.getToken.xml")
+    mocked_responses.get(
+        "http://192.168.0.1/api/1.0/?method=auth.getToken",
+        body=_load_fixture("auth.getToken.xml"),
     )
-    respx.get(
+    mocked_responses.get(
         "http://192.168.0.1/api/1.0/?method=auth.checkToken"
         "&token=afd1baa4cb261bfc08ec2dc0ade3b4"
         "&hash=3e89f9170f9e64e5132aa6f72a520ffd45f952f259872a60e9acde5dba45ff64"
-        "2df17d326805a188a8446a7cf9372132d617925ea7130947e9bbefa2a5b5bb84"
-    ).respond(text=_load_fixture("fail.204.xml"))
+        "2df17d326805a188a8446a7cf9372132d617925ea7130947e9bbefa2a5b5bb84",
+        body=_load_fixture("fail.204.xml"),
+    )
 
-    async with httpx.AsyncClient() as client:
+    async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         box._token = "previous_token"  # noqa: S105
         with pytest.raises(
@@ -83,11 +87,10 @@ async def test_authenticate_invalid_password() -> None:
     assert box._token is None
 
 
-@respx.mock
 @pytest.mark.asyncio
 async def test_authenticate_no_credentials() -> None:
     """It exits with a status code of zero."""
-    async with httpx.AsyncClient() as client:
+    async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         with pytest.raises(
             SFRBoxAuthenticationError, match="Credentials not set"
@@ -95,14 +98,16 @@ async def test_authenticate_no_credentials() -> None:
             await box._ensure_token()
 
 
-@respx.mock
 @pytest.mark.asyncio
-async def test_authenticate_method_not_allowed() -> None:
+async def test_authenticate_method_not_allowed(
+    mocked_responses: aioresponses,
+) -> None:
     """It exits with a status code of zero."""
-    respx.get("http://192.168.0.1/api/1.0/?method=auth.getToken").respond(
-        text=_load_fixture("auth.getToken.xml").replace('"all"', '"button"')
+    mocked_responses.get(
+        "http://192.168.0.1/api/1.0/?method=auth.getToken",
+        body=_load_fixture("auth.getToken.xml").replace('"all"', '"button"'),
     )
-    async with httpx.AsyncClient() as client:
+    async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         with pytest.raises(
             SFRBoxAuthenticationError,
@@ -111,16 +116,16 @@ async def test_authenticate_method_not_allowed() -> None:
             await box.authenticate(password="password")  # noqa: S106
 
 
-@respx.mock
 @pytest.mark.asyncio
-async def test_authenticate_method_not_allowed_domain() -> None:
+async def test_authenticate_method_not_allowed_domain(
+    mocked_responses: aioresponses,
+) -> None:
     """It exits with a status code of zero."""
-    respx.get(
-        "http://sfrbox.example.com/api/1.0/?method=auth.getToken"
-    ).respond(
-        text=_load_fixture("auth.getToken.xml").replace('"all"', '"button"')
+    mocked_responses.get(
+        "http://sfrbox.example.com/api/1.0/?method=auth.getToken",
+        body=_load_fixture("auth.getToken.xml").replace('"all"', '"button"'),
     )
-    async with httpx.AsyncClient() as client:
+    async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="http://sfrbox.example.com", client=client)
         with pytest.raises(
             SFRBoxAuthenticationError,
@@ -129,16 +134,16 @@ async def test_authenticate_method_not_allowed_domain() -> None:
             await box.authenticate(password="password")  # noqa: S106
 
 
-@respx.mock
 @pytest.mark.asyncio
-async def test_authenticate_method_not_allowed_domain_and_path() -> None:
+async def test_authenticate_method_not_allowed_domain_and_path(
+    mocked_responses: aioresponses,
+) -> None:
     """It exits with a status code of zero."""
-    respx.get(
-        "http://example.com/sfrbox/api/1.0/?method=auth.getToken"
-    ).respond(
-        text=_load_fixture("auth.getToken.xml").replace('"all"', '"button"')
+    mocked_responses.get(
+        "http://example.com/sfrbox/api/1.0/?method=auth.getToken",
+        body=_load_fixture("auth.getToken.xml").replace('"all"', '"button"'),
     )
-    async with httpx.AsyncClient() as client:
+    async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="http://example.com/sfrbox", client=client)
         with pytest.raises(
             SFRBoxAuthenticationError,
@@ -147,16 +152,16 @@ async def test_authenticate_method_not_allowed_domain_and_path() -> None:
             await box.authenticate(password="password")  # noqa: S106
 
 
-@respx.mock
 @pytest.mark.asyncio
-async def test_authenticate_method_not_allowed_https_and_domain() -> None:
+async def test_authenticate_method_not_allowed_https_and_domain(
+    mocked_responses: aioresponses,
+) -> None:
     """It exits with a status code of zero."""
-    respx.get(
-        "https://sfrbox.example.com/api/1.0/?method=auth.getToken"
-    ).respond(
-        text=_load_fixture("auth.getToken.xml").replace('"all"', '"button"')
+    mocked_responses.get(
+        "https://sfrbox.example.com/api/1.0/?method=auth.getToken",
+        body=_load_fixture("auth.getToken.xml").replace('"all"', '"button"'),
     )
-    async with httpx.AsyncClient() as client:
+    async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="https://sfrbox.example.com", client=client)
         with pytest.raises(
             SFRBoxAuthenticationError,
@@ -165,14 +170,16 @@ async def test_authenticate_method_not_allowed_https_and_domain() -> None:
             await box.authenticate(password="password")  # noqa: S106
 
 
-@respx.mock
 @pytest.mark.asyncio
-async def test_dsl_getinfo_3dcm020200r015() -> None:
+async def test_dsl_getinfo_3dcm020200r015(
+    mocked_responses: aioresponses,
+) -> None:
     """It exits with a status code of zero."""
-    respx.get("http://192.168.0.1/api/1.0/?method=dsl.getInfo").respond(
-        text=_load_fixture("dsl.getInfo.3DCM020200r015.xml")
+    mocked_responses.get(
+        "http://192.168.0.1/api/1.0/?method=dsl.getInfo",
+        body=_load_fixture("dsl.getInfo.3DCM020200r015.xml"),
     )
-    async with httpx.AsyncClient() as client:
+    async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         info = await box.dsl_get_info()
         assert info == DslInfo(
@@ -192,14 +199,14 @@ async def test_dsl_getinfo_3dcm020200r015() -> None:
         )
 
 
-@respx.mock
 @pytest.mark.asyncio
-async def test_dsl_getinfo() -> None:
+async def test_dsl_getinfo(mocked_responses: aioresponses) -> None:
     """It exits with a status code of zero."""
-    respx.get("http://192.168.0.1/api/1.0/?method=dsl.getInfo").respond(
-        text=_load_fixture("dsl.getInfo.xml")
+    mocked_responses.get(
+        "http://192.168.0.1/api/1.0/?method=dsl.getInfo",
+        body=_load_fixture("dsl.getInfo.xml"),
     )
-    async with httpx.AsyncClient() as client:
+    async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         info = await box.dsl_get_info()
         assert info == DslInfo(
@@ -219,40 +226,42 @@ async def test_dsl_getinfo() -> None:
         )
 
 
-@respx.mock
 @pytest.mark.asyncio
-async def test_ftth_getinfo() -> None:
+async def test_ftth_getinfo(mocked_responses: aioresponses) -> None:
     """It exits with a status code of zero."""
-    respx.get("http://192.168.0.1/api/1.0/?method=ftth.getInfo").respond(
-        text=_load_fixture("ftth.getInfo.xml")
+    mocked_responses.get(
+        "http://192.168.0.1/api/1.0/?method=ftth.getInfo",
+        body=_load_fixture("ftth.getInfo.xml"),
     )
-    async with httpx.AsyncClient() as client:
+    async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         info = await box.ftth_get_info()
         assert info == FtthInfo(status="down", wanfibre="out")
 
 
-@respx.mock
 @pytest.mark.asyncio
-async def test_ftth_getinfo_3dcm020200r015() -> None:
+async def test_ftth_getinfo_3dcm020200r015(
+    mocked_responses: aioresponses,
+) -> None:
     """It exits with a status code of zero."""
-    respx.get("http://192.168.0.1/api/1.0/?method=ftth.getInfo").respond(
-        text=_load_fixture("ftth.getInfo.3DCM020200r015.xml")
+    mocked_responses.get(
+        "http://192.168.0.1/api/1.0/?method=ftth.getInfo",
+        body=_load_fixture("ftth.getInfo.3DCM020200r015.xml"),
     )
-    async with httpx.AsyncClient() as client:
+    async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         info = await box.ftth_get_info()
         assert info is None
 
 
-@respx.mock
 @pytest.mark.asyncio
-async def test_system_getinfo() -> None:
+async def test_system_getinfo(mocked_responses: aioresponses) -> None:
     """It exits with a status code of zero."""
-    respx.get("http://192.168.0.1/api/1.0/?method=system.getInfo").respond(
-        text=_load_fixture("system.getInfo.xml")
+    mocked_responses.get(
+        "http://192.168.0.1/api/1.0/?method=system.getInfo",
+        body=_load_fixture("system.getInfo.xml"),
     )
-    async with httpx.AsyncClient() as client:
+    async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         info = await box.system_get_info()
         assert info == SystemInfo(
@@ -274,14 +283,14 @@ async def test_system_getinfo() -> None:
         )
 
 
-@respx.mock
 @pytest.mark.asyncio
-async def test_system_getinfo_3_5_8() -> None:
+async def test_system_getinfo_3_5_8(mocked_responses: aioresponses) -> None:
     """It exits with a status code of zero."""
-    respx.get("http://192.168.0.1/api/1.0/?method=system.getInfo").respond(
-        text=_load_fixture("system.getInfo.3_5_8.xml")
+    mocked_responses.get(
+        "http://192.168.0.1/api/1.0/?method=system.getInfo",
+        body=_load_fixture("system.getInfo.3_5_8.xml"),
     )
-    async with httpx.AsyncClient() as client:
+    async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         info = await box.system_get_info()
         assert info == SystemInfo(
@@ -303,14 +312,16 @@ async def test_system_getinfo_3_5_8() -> None:
         )
 
 
-@respx.mock
 @pytest.mark.asyncio
-async def test_system_getinfo_3dcm020200r015() -> None:
+async def test_system_getinfo_3dcm020200r015(
+    mocked_responses: aioresponses,
+) -> None:
     """It exits with a status code of zero."""
-    respx.get("http://192.168.0.1/api/1.0/?method=system.getInfo").respond(
-        text=_load_fixture("system.getInfo.3DCM020200r015.xml")
+    mocked_responses.get(
+        "http://192.168.0.1/api/1.0/?method=system.getInfo",
+        body=_load_fixture("system.getInfo.3DCM020200r015.xml"),
     )
-    async with httpx.AsyncClient() as client:
+    async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         info = await box.system_get_info()
         assert info == SystemInfo(
@@ -332,14 +343,16 @@ async def test_system_getinfo_3dcm020200r015() -> None:
         )
 
 
-@respx.mock
 @pytest.mark.asyncio
-async def test_system_getinfo_box10h_xbsp_1_6_14_1() -> None:
+async def test_system_getinfo_box10h_xbsp_1_6_14_1(
+    mocked_responses: aioresponses,
+) -> None:
     """It exits with a status code of zero."""
-    respx.get("http://192.168.0.1/api/1.0/?method=system.getInfo").respond(
-        text=_load_fixture("system.getInfo.BOX10H-XbSP-1.6.14.1.xml")
+    mocked_responses.get(
+        "http://192.168.0.1/api/1.0/?method=system.getInfo",
+        body=_load_fixture("system.getInfo.BOX10H-XbSP-1.6.14.1.xml"),
     )
-    async with httpx.AsyncClient() as client:
+    async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         info = await box.system_get_info()
         assert info == SystemInfo(
@@ -361,28 +374,28 @@ async def test_system_getinfo_box10h_xbsp_1_6_14_1() -> None:
         )
 
 
-@respx.mock
 @pytest.mark.asyncio
-async def test_system_reboot() -> None:
+async def test_system_reboot(mocked_responses: aioresponses) -> None:
     """It exits with a status code of zero."""
-    respx.post(
-        "http://192.168.0.1/api/1.0/?method=system.reboot&token=afd1baa4cb261bfc08ec2dc0ade3b4"
-    ).respond(text=_load_fixture("ok.xml"))
-    async with httpx.AsyncClient() as client:
+    mocked_responses.post(
+        "http://192.168.0.1/api/1.0/?method=system.reboot&token=afd1baa4cb261bfc08ec2dc0ade3b4",
+        body=_load_fixture("ok.xml"),
+    )
+    async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         box._token = "afd1baa4cb261bfc08ec2dc0ade3b4"  # noqa: S105
         box._token_time = time.time()
         await box.system_reboot()
 
 
-@respx.mock
 @pytest.mark.asyncio
-async def test_system_reboot_bad_auth() -> None:
+async def test_system_reboot_bad_auth(mocked_responses: aioresponses) -> None:
     """It exits with a status code of zero."""
-    respx.post(
-        "http://192.168.0.1/api/1.0/?method=system.reboot&token=invalid_token"
-    ).respond(text=_load_fixture("fail.115.xml"))
-    async with httpx.AsyncClient() as client:
+    mocked_responses.post(
+        "http://192.168.0.1/api/1.0/?method=system.reboot&token=invalid_token",
+        body=_load_fixture("fail.115.xml"),
+    )
+    async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         box._token = "invalid_token"  # noqa: S105
         box._token_time = time.time()
@@ -393,14 +406,14 @@ async def test_system_reboot_bad_auth() -> None:
             await box.system_reboot()
 
 
-@respx.mock
 @pytest.mark.asyncio
-async def test_wan_getinfo() -> None:
+async def test_wan_getinfo(mocked_responses: aioresponses) -> None:
     """It exits with a status code of zero."""
-    respx.get("http://192.168.0.1/api/1.0/?method=wan.getInfo").respond(
-        text=_load_fixture("wan.getInfo.xml")
+    mocked_responses.get(
+        "http://192.168.0.1/api/1.0/?method=wan.getInfo",
+        body=_load_fixture("wan.getInfo.xml"),
     )
-    async with httpx.AsyncClient() as client:
+    async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         info = await box.wan_get_info()
         assert info == WanInfo(
@@ -416,14 +429,14 @@ async def test_wan_getinfo() -> None:
         )
 
 
-@respx.mock
 @pytest.mark.asyncio
-async def test_wlan_getclientlist() -> None:
+async def test_wlan_getclientlist(mocked_responses: aioresponses) -> None:
     """It exits with a status code of zero."""
-    respx.get(
-        "http://192.168.0.1/api/1.0/?method=wlan.getClientList&token=afd1baa4cb261bfc08ec2dc0ade3b4"
-    ).respond(text=_load_fixture("wlan.getClientList.xml"))
-    async with httpx.AsyncClient() as client:
+    mocked_responses.get(
+        "http://192.168.0.1/api/1.0/?method=wlan.getClientList&token=afd1baa4cb261bfc08ec2dc0ade3b4",
+        body=_load_fixture("wlan.getClientList.xml"),
+    )
+    async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         box._token = "afd1baa4cb261bfc08ec2dc0ade3b4"  # noqa: S105
         box._token_time = time.time()
@@ -440,14 +453,14 @@ async def test_wlan_getclientlist() -> None:
         )
 
 
-@respx.mock
 @pytest.mark.asyncio
-async def test_wlan_getinfo() -> None:
+async def test_wlan_getinfo(mocked_responses: aioresponses) -> None:
     """It exits with a status code of zero."""
-    respx.get(
-        "http://192.168.0.1/api/1.0/?method=wlan.getInfo&token=afd1baa4cb261bfc08ec2dc0ade3b4"
-    ).respond(text=_load_fixture("wlan.getInfo.xml"))
-    async with httpx.AsyncClient() as client:
+    mocked_responses.get(
+        "http://192.168.0.1/api/1.0/?method=wlan.getInfo&token=afd1baa4cb261bfc08ec2dc0ade3b4",
+        body=_load_fixture("wlan.getInfo.xml"),
+    )
+    async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         box._token = "afd1baa4cb261bfc08ec2dc0ade3b4"  # noqa: S105
         box._token_time = time.time()
@@ -467,14 +480,14 @@ async def test_wlan_getinfo() -> None:
         )
 
 
-@respx.mock
 @pytest.mark.asyncio
-async def test_wan_getinfo_fail() -> None:
+async def test_wan_getinfo_fail(mocked_responses: aioresponses) -> None:
     """It exits with a status code of zero."""
-    respx.get("http://192.168.0.1/api/1.0/?method=wan.getInfo").respond(
-        text=_load_fixture("fail.xml")
+    mocked_responses.get(
+        "http://192.168.0.1/api/1.0/?method=wan.getInfo",
+        body=_load_fixture("fail.xml"),
     )
-    async with httpx.AsyncClient() as client:
+    async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         with pytest.raises(
             SFRBoxApiError,
@@ -485,14 +498,13 @@ async def test_wan_getinfo_fail() -> None:
             await box.wan_get_info()
 
 
-@respx.mock
 @pytest.mark.asyncio
-async def test_wan_getinfo_invalid_xml() -> None:
+async def test_wan_getinfo_invalid_xml(mocked_responses: aioresponses) -> None:
     """It exits with a status code of zero."""
-    respx.get("http://192.168.0.1/api/1.0/?method=wan.getInfo").respond(
-        text="Invalid XML"
+    mocked_responses.get(
+        "http://192.168.0.1/api/1.0/?method=wan.getInfo", body="Invalid XML"
     )
-    async with httpx.AsyncClient() as client:
+    async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         with pytest.raises(
             SFRBoxError, match="Failed to parse response: Invalid XML"
@@ -500,14 +512,16 @@ async def test_wan_getinfo_invalid_xml() -> None:
             await box.wan_get_info()
 
 
-@respx.mock
 @pytest.mark.asyncio
-async def test_wan_getinfo_incorrect_xml() -> None:
+async def test_wan_getinfo_incorrect_xml(
+    mocked_responses: aioresponses,
+) -> None:
     """It exits with a status code of zero."""
-    respx.get("http://192.168.0.1/api/1.0/?method=wan.getInfo").respond(
-        text="<incorrect_xml />"
+    mocked_responses.get(
+        "http://192.168.0.1/api/1.0/?method=wan.getInfo",
+        body="<incorrect_xml />",
     )
-    async with httpx.AsyncClient() as client:
+    async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         with pytest.raises(
             SFRBoxError, match="Response was not ok: <incorrect_xml />"
@@ -515,14 +529,16 @@ async def test_wan_getinfo_incorrect_xml() -> None:
             await box.wan_get_info()
 
 
-@respx.mock
 @pytest.mark.asyncio
-async def test_wan_getinfo_incorrect_namespace() -> None:
+async def test_wan_getinfo_incorrect_namespace(
+    mocked_responses: aioresponses,
+) -> None:
     """It exits with a status code of zero."""
-    respx.get("http://192.168.0.1/api/1.0/?method=wan.getInfo").respond(
-        text=_load_fixture("dsl.getInfo.xml")
+    mocked_responses.get(
+        "http://192.168.0.1/api/1.0/?method=wan.getInfo",
+        body=_load_fixture("dsl.getInfo.xml"),
     )
-    async with httpx.AsyncClient() as client:
+    async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         with pytest.raises(
             SFRBoxError, match="Namespace wan not found in response"
@@ -530,52 +546,54 @@ async def test_wan_getinfo_incorrect_namespace() -> None:
             await box.wan_get_info()
 
 
-@respx.mock
 @pytest.mark.asyncio
-async def test_connect_timeout() -> None:
+async def test_connect_timeout(mocked_responses: aioresponses) -> None:
     """It exits with a status code of zero."""
-    respx.get("http://192.168.0.1/api/1.0/?method=wan.getInfo").mock(
-        side_effect=httpx.ConnectTimeout
+    mocked_responses.get(
+        "http://192.168.0.1/api/1.0/?method=wan.getInfo",
+        exception=aiohttp.ConnectionTimeoutError,
     )
-    async with httpx.AsyncClient() as client:
+    async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         with pytest.raises(SFRBoxError):
             await box.wan_get_info()
 
 
-@respx.mock
 @pytest.mark.asyncio
-async def test_500_error() -> None:
+async def test_500_error(mocked_responses: aioresponses) -> None:
     """It exits with a status code of zero."""
-    respx.get("http://192.168.0.1/api/1.0/?method=wan.getInfo").respond(500)
-    async with httpx.AsyncClient() as client:
+    mocked_responses.get(
+        "http://192.168.0.1/api/1.0/?method=wan.getInfo",
+        status=500,
+    )
+    async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         with pytest.raises(SFRBoxError):
             await box.wan_get_info()
 
 
-@respx.mock
 @pytest.mark.asyncio
-async def test_enable_wifi() -> None:
+async def test_enable_wifi(mocked_responses: aioresponses) -> None:
     """It exits with a status code of zero."""
-    respx.post(
-        "http://192.168.0.1/api/1.0/?method=wlan.enable&token=afd1baa4cb261bfc08ec2dc0ade3b4"
-    ).respond(text=_load_fixture("ok.xml"))
-    async with httpx.AsyncClient() as client:
+    mocked_responses.post(
+        "http://192.168.0.1/api/1.0/?method=wlan.enable&token=afd1baa4cb261bfc08ec2dc0ade3b4",
+        body=_load_fixture("ok.xml"),
+    )
+    async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         box._token = "afd1baa4cb261bfc08ec2dc0ade3b4"  # noqa: S105
         box._token_time = time.time()
         await box.wlan_enable()
 
 
-@respx.mock
 @pytest.mark.asyncio
-async def test_enable_wifi_bad_auth() -> None:
+async def test_enable_wifi_bad_auth(mocked_responses: aioresponses) -> None:
     """It exits with a status code of zero."""
-    respx.post(
-        "http://192.168.0.1/api/1.0/?method=wlan.enable&token=invalid_token"
-    ).respond(text=_load_fixture("fail.115.xml"))
-    async with httpx.AsyncClient() as client:
+    mocked_responses.post(
+        "http://192.168.0.1/api/1.0/?method=wlan.enable&token=invalid_token",
+        body=_load_fixture("fail.115.xml"),
+    )
+    async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         box._token = "invalid_token"  # noqa: S105
         box._token_time = time.time()
@@ -586,28 +604,28 @@ async def test_enable_wifi_bad_auth() -> None:
             await box.wlan_enable()
 
 
-@respx.mock
 @pytest.mark.asyncio
-async def test_disable_wifi() -> None:
+async def test_disable_wifi(mocked_responses: aioresponses) -> None:
     """It exits with a status code of zero."""
-    respx.post(
-        "http://192.168.0.1/api/1.0/?method=wlan.disable&token=afd1baa4cb261bfc08ec2dc0ade3b4"
-    ).respond(text=_load_fixture("ok.xml"))
-    async with httpx.AsyncClient() as client:
+    mocked_responses.post(
+        "http://192.168.0.1/api/1.0/?method=wlan.disable&token=afd1baa4cb261bfc08ec2dc0ade3b4",
+        body=_load_fixture("ok.xml"),
+    )
+    async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         box._token = "afd1baa4cb261bfc08ec2dc0ade3b4"  # noqa: S105
         box._token_time = time.time()
         await box.wlan_disable()
 
 
-@respx.mock
 @pytest.mark.asyncio
-async def test_disable_wifi_bad_auth() -> None:
+async def test_disable_wifi_bad_auth(mocked_responses: aioresponses) -> None:
     """It exits with a status code of zero."""
-    respx.post(
-        "http://192.168.0.1/api/1.0/?method=wlan.disable&token=invalid_token"
-    ).respond(text=_load_fixture("fail.115.xml"))
-    async with httpx.AsyncClient() as client:
+    mocked_responses.post(
+        "http://192.168.0.1/api/1.0/?method=wlan.disable&token=invalid_token",
+        body=_load_fixture("fail.115.xml"),
+    )
+    async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         box._token = "invalid_token"  # noqa: S105
         box._token_time = time.time()
@@ -618,28 +636,28 @@ async def test_disable_wifi_bad_auth() -> None:
             await box.wlan_disable()
 
 
-@respx.mock
 @pytest.mark.asyncio
-async def test_restart_wifi() -> None:
+async def test_restart_wifi(mocked_responses: aioresponses) -> None:
     """It exits with a status code of zero."""
-    respx.post(
-        "http://192.168.0.1/api/1.0/?method=wlan.restart&token=afd1baa4cb261bfc08ec2dc0ade3b4"
-    ).respond(text=_load_fixture("ok.xml"))
-    async with httpx.AsyncClient() as client:
+    mocked_responses.post(
+        "http://192.168.0.1/api/1.0/?method=wlan.restart&token=afd1baa4cb261bfc08ec2dc0ade3b4",
+        body=_load_fixture("ok.xml"),
+    )
+    async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         box._token = "afd1baa4cb261bfc08ec2dc0ade3b4"  # noqa: S105
         box._token_time = time.time()
         await box.wlan_restart()
 
 
-@respx.mock
 @pytest.mark.asyncio
-async def test_restart_wifi_bad_auth() -> None:
+async def test_restart_wifi_bad_auth(mocked_responses: aioresponses) -> None:
     """It exits with a status code of zero."""
-    respx.post(
-        "http://192.168.0.1/api/1.0/?method=wlan.restart&token=invalid_token"
-    ).respond(text=_load_fixture("fail.115.xml"))
-    async with httpx.AsyncClient() as client:
+    mocked_responses.post(
+        "http://192.168.0.1/api/1.0/?method=wlan.restart&token=invalid_token",
+        body=_load_fixture("fail.115.xml"),
+    )
+    async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
         box._token = "invalid_token"  # noqa: S105
         box._token_time = time.time()
