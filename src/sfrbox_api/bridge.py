@@ -13,8 +13,8 @@ from typing import Any
 from typing import TypeVar
 from xml.etree.ElementTree import Element as XmlElement  # noqa: S405
 
+import aiohttp
 import defusedxml.ElementTree as DefusedElementTree
-import httpx
 from mashumaro import DataClassDictMixin
 from typing_extensions import ParamSpec
 
@@ -51,7 +51,7 @@ def _with_error_wrapping(
         """Catch RequestError errors and raise SFRBoxError."""
         try:
             return await func(*args, **kwargs)
-        except httpx.HTTPError as err:
+        except aiohttp.ClientError as err:
             raise SFRBoxError(str(err)) from err
 
     return wrapper
@@ -65,7 +65,7 @@ class SFRBox:
     _username: str | None = None
     _password: str | None = None
 
-    def __init__(self, *, ip: str, client: httpx.AsyncClient) -> None:
+    def __init__(self, *, ip: str, client: aiohttp.ClientSession) -> None:
         """Initialise SFR Box bridge."""
         if ip.startswith("http://") or ip.startswith("https://"):
             self._url = ip
@@ -107,18 +107,21 @@ class SFRBox:
         assert element is not None  # noqa: S101
         return element.get("token", "")
 
-    def _check_response(self, response: httpx.Response) -> XmlElement:
+    async def _check_response(
+        self, response: aiohttp.ClientResponse
+    ) -> XmlElement:
+        response_text = await response.text()
         _LOGGER.debug(
             'HTTP Response: %s %s "%s %s %s" %s',
-            response.request.method,
+            response.method,
             response.url,
-            response.http_version,
-            response.status_code,
-            response.reason_phrase,
-            response.text,
+            response.version,
+            response.status,
+            response.reason,
+            response_text,
         )
         response.raise_for_status()
-        response_text: str = response.text
+        response_text = response_text
         if "</firewall>" in response_text and "<dsl" in response_text:
             # There is a bug in firmware 3DCM020200r015
             response_text = response_text.replace("</firewall>", "/>")
@@ -151,22 +154,22 @@ class SFRBox:
     async def _send_get_simple(
         self, namespace: str, method: str, **kwargs: str
     ) -> XmlElement:
-        params = httpx.QueryParams(method=f"{namespace}.{method}", **kwargs)
+        params = {"method": f"{namespace}.{method}", **kwargs}
         response = await self._client.get(
             f"{self._url}/api/1.0/", params=params
         )
-        element = self._check_response(response)
+        element = await self._check_response(response)
         return element
 
     @_with_error_wrapping
     async def _send_get(
         self, namespace: str, method: str, **kwargs: str
     ) -> XmlElement | None:
-        params = httpx.QueryParams(method=f"{namespace}.{method}", **kwargs)
+        params = {"method": f"{namespace}.{method}", **kwargs}
         response = await self._client.get(
             f"{self._url}/api/1.0/", params=params
         )
-        element = self._check_response(response)
+        element = await self._check_response(response)
         if len(element) == 0:
             return None
         result = element.find(namespace)
@@ -185,11 +188,11 @@ class SFRBox:
         token: str,
         data: Mapping[str, Any] | None = None,
     ) -> None:
-        params = httpx.QueryParams(method=f"{namespace}.{method}", token=token)
+        params = {"method": f"{namespace}.{method}", "token": token}
         response = await self._client.post(
             f"{self._url}/api/1.0/", params=params, data=data
         )
-        self._check_response(response)
+        await self._check_response(response)
 
     def _create_class(
         self,
