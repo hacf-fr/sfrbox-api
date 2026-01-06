@@ -37,7 +37,7 @@ Pygments = "==2.19.2"
 ruff = "==0.14.10"
 coverage = {extras = ["toml"], version = "==7.13.1"}
 darglint = "==1.8.1"
-furo = "==2025.9.25"
+furo = "==2025.12.19"
 mypy = "1.18.2"
 pre-commit = "==4.3.0"
 pre-commit-hooks = "==6.0.0"
