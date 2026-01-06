@@ -39,7 +39,7 @@ coverage = {extras = ["toml"], version = "==7.13.1"}
 darglint = "==1.8.1"
 furo = "==2025.12.19"
 mypy = "1.19.1"
-pre-commit = "==4.3.0"
+pre-commit = "==4.5.1"
 pre-commit-hooks = "==6.0.0"
 pytest = "==8.4.2"
 pytest-asyncio = "==1.2.0"
