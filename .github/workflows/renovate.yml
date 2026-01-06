@@ -1,0 +1,23 @@
+name: Renovate
+
+on:
+  schedule:
+    - cron: "5/30 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  renovate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.1
+      - name: Self-hosted Renovate
+        uses: renovatebot/github-action@v44.2.3
+        with:
+          configurationFile: .github/renovate-config.js
+          token: ${{ secrets.RENOVATE_TOKEN }}
