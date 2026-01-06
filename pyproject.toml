@@ -35,7 +35,7 @@ click = { version = ">=8.0.1", optional = true }
 [tool.poetry.group.dev.dependencies]
 Pygments = "==2.19.2"
 ruff = "==0.14.10"
-coverage = {extras = ["toml"], version = "==7.11.0"}
+coverage = {extras = ["toml"], version = "==7.13.1"}
 darglint = "==1.8.1"
 furo = "==2025.9.25"
 mypy = "1.18.2"
