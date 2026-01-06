@@ -31,7 +31,7 @@
     {
       "matchManagers": ["npm", "nvm"],
       "matchUpdateTypes": ["minor", "patch"],
-      "automerge": false
+      "automerge": true
     },
     {
       "matchManagers": ["github-actions"],
@@ -41,7 +41,7 @@
     {
       "matchManagers": ["github-actions"],
       "matchUpdateTypes": ["minor", "patch"],
-      "automerge": false
+      "automerge": true
     }
   ]
 }
