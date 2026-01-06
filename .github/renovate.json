@@ -21,7 +21,7 @@
     {
       "matchManagers": ["poetry"],
       "matchUpdateTypes": ["minor", "patch"],
-      "automerge": false
+      "automerge": true
     },
     {
       "matchManagers": ["npm", "nvm"],
