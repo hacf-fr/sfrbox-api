@@ -1,7 +1,6 @@
 # SFR Box API
 
 [![PyPI](https://img.shields.io/pypi/v/sfrbox-api.svg)][pypi_]
-[![Status](https://img.shields.io/pypi/status/sfrbox-api.svg)][status]
 [![Python Version](https://img.shields.io/pypi/pyversions/sfrbox-api)][python version]
 [![License](https://img.shields.io/pypi/l/sfrbox-api)][license]
 
@@ -10,16 +9,15 @@
 [![Codecov](https://codecov.io/gh/hacf-fr/sfrbox-api/branch/main/graph/badge.svg)][codecov]
 
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)][pre-commit]
-[![Black](https://img.shields.io/badge/code%20style-black-000000.svg)][black]
+[![ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)][ruff]
 
 [pypi_]: https://pypi.org/project/sfrbox-api/
-[status]: https://pypi.org/project/sfrbox-api/
 [python version]: https://pypi.org/project/sfrbox-api
 [read the docs]: https://sfrbox-api.readthedocs.io/
 [tests]: https://github.com/hacf-fr/sfrbox-api/actions?workflow=Tests
 [codecov]: https://app.codecov.io/gh/hacf-fr/sfrbox-api
 [pre-commit]: https://github.com/pre-commit/pre-commit
-[black]: https://github.com/psf/black
+[ruff]: https://github.com/astral-sh/ruff
 
 ## Features
 
