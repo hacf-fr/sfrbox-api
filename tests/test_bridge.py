@@ -15,6 +15,7 @@ from sfrbox_api.exceptions import SFRBoxError
 from sfrbox_api.models import DslInfo
 from sfrbox_api.models import FtthInfo
 from sfrbox_api.models import SystemInfo
+from sfrbox_api.models import VoipInfo
 from sfrbox_api.models import WanInfo
 from sfrbox_api.models import WlanClient
 from sfrbox_api.models import WlanClientList
@@ -404,6 +405,26 @@ async def test_system_reboot_bad_auth(mocked_responses: aioresponses) -> None:
             match=re.escape("Api call failed: [115] Authentication needed"),
         ):
             await box.system_reboot()
+
+
+@pytest.mark.asyncio
+async def test_voip_getinfo(mocked_responses: aioresponses) -> None:
+    """It exits with a status code of zero."""
+    mocked_responses.get(
+        "http://192.168.0.1/api/1.0/?method=voip.getInfo&token=afd1baa4cb261bfc08ec2dc0ade3b4",
+        body=_load_fixture("voip.getInfo.xml"),
+    )
+    async with aiohttp.ClientSession() as client:
+        box = SFRBox(ip="192.168.0.1", client=client)
+        box._token = "afd1baa4cb261bfc08ec2dc0ade3b4"  # noqa: S105
+        box._token_time = time.time()
+        info = await box.voip_get_info()
+        assert info == VoipInfo(
+            status="up",
+            infra="ftth",
+            hook_status="onhook",
+            callhistory_active="on",
+        )
 
 
 @pytest.mark.asyncio
