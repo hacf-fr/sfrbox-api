@@ -243,8 +243,7 @@ class SFRBox:
         calls: list[VoipCallHistoryEntry] = []
         for call in xml_response.findall("calls/call"):
             call_details = self._create_class(VoipCallHistoryEntry, call)
-            if call_details is not None:
-                calls.append(call_details)
+            calls.append(call_details)  # type: ignore[arg-type]
         return VoipCallHistory(entries=calls)
 
     async def wan_get_info(self) -> WanInfo | None:
