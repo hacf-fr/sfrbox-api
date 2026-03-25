@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rsp stat="ok" version="1.0">
+     <calls>
+
+      <call type="voip" direction="incoming" number="012345 XXXX" length="41" date="1774253416" />
+
+      <call type="voip" direction="incoming" number="067890 XXXX" length="18" date="1774253539" />
+
+      <call type="voip" direction="outgoing" number="18" length="665" date="1774254035" />
+
+      <call type="voip" direction="outgoing" number="18" length="3" date="1774258571" />
+
+      <call type="voip" direction="incoming" number="023456 XXXX" length="-1" date="1774309693" />
+
+      <call type="voip" direction="incoming" number="" length="17" date="1774339427" />
+
+   </calls>
+
+
+</rsp>
