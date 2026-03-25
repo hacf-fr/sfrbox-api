@@ -26,6 +26,8 @@ from .exceptions import SFRBoxError
 from .models import DslInfo
 from .models import FtthInfo
 from .models import SystemInfo
+from .models import VoipCallHistory
+from .models import VoipCallHistoryEntry
 from .models import WanInfo
 from .models import WlanClient
 from .models import WlanClientList
@@ -231,6 +233,19 @@ class SFRBox:
         """Redémarrer la BOX."""
         token = await self._ensure_token()
         await self._send_post("system", "reboot", token=token)
+
+    async def voip_get_call_history(self) -> VoipCallHistory:
+        """Renvoie l'historique des appels VoIP."""
+        token = await self._ensure_token()
+        xml_response = await self._send_get_simple(
+            "voip", "getCallhistoryList", token=token
+        )
+        calls: list[VoipCallHistoryEntry] = []
+        for call in xml_response.findall("calls/call"):
+            call_details = self._create_class(VoipCallHistoryEntry, call)
+            if call_details is not None:
+                calls.append(call_details)
+        return VoipCallHistory(entries=calls)
 
     async def wan_get_info(self) -> WanInfo | None:
         """Renvoie les informations génériques sur la connexion internet."""
