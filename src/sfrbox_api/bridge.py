@@ -26,6 +26,7 @@ from .exceptions import SFRBoxError
 from .models import DslInfo
 from .models import FtthInfo
 from .models import SystemInfo
+from .models import VoipInfo
 from .models import WanInfo
 from .models import WlanClient
 from .models import WlanClientList
@@ -231,6 +232,12 @@ class SFRBox:
         """Redémarrer la BOX."""
         token = await self._ensure_token()
         await self._send_post("system", "reboot", token=token)
+
+    async def voip_get_info(self) -> VoipInfo | None:
+        """Renvoie les informations sur la voix sur IP."""
+        token = await self._ensure_token()
+        xml_response = await self._send_get("voip", "getInfo", token=token)
+        return self._create_class(VoipInfo, xml_response)
 
     async def wan_get_info(self) -> WanInfo | None:
         """Renvoie les informations génériques sur la connexion internet."""
