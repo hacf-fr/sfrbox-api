@@ -132,7 +132,7 @@ class SystemInfo(DataClassDictMixin):
 
 
 @dataclass
-class VoipCallHistoryEntry(DataClassDictMixin):
+class VoipCallHistoryCall(DataClassDictMixin):
     """Entrée de l'historique des appels VoIP."""
 
     type: str
@@ -152,10 +152,10 @@ class VoipCallHistoryEntry(DataClassDictMixin):
 
 
 @dataclass
-class VoipCallHistory(DataClassDictMixin):
+class VoipCallHistoryList(DataClassDictMixin):
     """Historique des appels VoIP."""
 
-    entries: "list[VoipCallHistoryEntry]"
+    entries: "list[VoipCallHistoryCall]"
     """Liste des entrées de l'historique des appels VoIP."""
 
 
