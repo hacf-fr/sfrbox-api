@@ -422,7 +422,7 @@ async def test_voip_getcallhistorylist(mocked_responses: aioresponses) -> None:
         box._token_time = time.time()
         calls = await box.voip_get_call_history_list()
         assert calls == VoipCallHistoryList(
-            entries=[
+            calls=[
                 VoipCallHistoryCall(
                     type="voip",
                     direction="incoming",

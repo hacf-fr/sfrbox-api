@@ -245,7 +245,7 @@ class SFRBox:
         for call in xml_response.findall("calls/call"):
             call_details = self._create_class(VoipCallHistoryCall, call)
             calls.append(call_details)  # type: ignore[arg-type]
-        return VoipCallHistoryList(entries=calls)
+        return VoipCallHistoryList(calls=calls)
 
     async def voip_get_info(self) -> VoipInfo | None:
         """Renvoie les informations sur la voix sur IP."""
