@@ -15,6 +15,8 @@ from sfrbox_api.exceptions import SFRBoxError
 from sfrbox_api.models import DslInfo
 from sfrbox_api.models import FtthInfo
 from sfrbox_api.models import SystemInfo
+from sfrbox_api.models import VoipCallHistoryCall
+from sfrbox_api.models import VoipCallHistoryList
 from sfrbox_api.models import VoipInfo
 from sfrbox_api.models import WanInfo
 from sfrbox_api.models import WlanClient
@@ -405,6 +407,66 @@ async def test_system_reboot_bad_auth(mocked_responses: aioresponses) -> None:
             match=re.escape("Api call failed: [115] Authentication needed"),
         ):
             await box.system_reboot()
+
+
+@pytest.mark.asyncio
+async def test_voip_getcallhistorylist(mocked_responses: aioresponses) -> None:
+    """It exits with a status code of zero."""
+    mocked_responses.get(
+        "http://192.168.0.1/api/1.0/?method=voip.getCallhistoryList&token=afd1baa4cb261bfc08ec2dc0ade3b4",
+        body=_load_fixture("voip.getCallHistory.xml"),
+    )
+    async with aiohttp.ClientSession() as client:
+        box = SFRBox(ip="192.168.0.1", client=client)
+        box._token = "afd1baa4cb261bfc08ec2dc0ade3b4"  # noqa: S105
+        box._token_time = time.time()
+        calls = await box.voip_get_call_history_list()
+        assert calls == VoipCallHistoryList(
+            entries=[
+                VoipCallHistoryCall(
+                    type="voip",
+                    direction="incoming",
+                    number="012345 XXXX",
+                    length=41,
+                    date=1774253416,
+                ),
+                VoipCallHistoryCall(
+                    type="voip",
+                    direction="incoming",
+                    number="067890 XXXX",
+                    length=18,
+                    date=1774253539,
+                ),
+                VoipCallHistoryCall(
+                    type="voip",
+                    direction="outgoing",
+                    number="18",
+                    length=665,
+                    date=1774254035,
+                ),
+                VoipCallHistoryCall(
+                    type="voip",
+                    direction="outgoing",
+                    number="18",
+                    length=3,
+                    date=1774258571,
+                ),
+                VoipCallHistoryCall(
+                    type="voip",
+                    direction="incoming",
+                    number="023456 XXXX",
+                    length=-1,
+                    date=1774309693,
+                ),
+                VoipCallHistoryCall(
+                    type="voip",
+                    direction="incoming",
+                    number="",
+                    length=17,
+                    date=1774339427,
+                ),
+            ]
+        )
 
 
 @pytest.mark.asyncio

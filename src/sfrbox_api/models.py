@@ -132,6 +132,34 @@ class SystemInfo(DataClassDictMixin):
 
 
 @dataclass
+class VoipCallHistoryCall(DataClassDictMixin):
+    """Entrée de l'historique des appels VoIP."""
+
+    type: str
+    """Type d'appel.
+
+    = (voip)"""
+    direction: str
+    """Direction de l'appel.
+
+    = (incoming|outgoing)"""
+    number: str
+    """Numéro de téléphone. Vide si le numéro est masqué."""
+    length: int
+    """Durée de l'appel en seconde. -1 si l'appel a été manqué."""
+    date: int
+    """Date de l'appel exprimé en secondes."""
+
+
+@dataclass
+class VoipCallHistoryList(DataClassDictMixin):
+    """Historique des appels VoIP."""
+
+    entries: "list[VoipCallHistoryCall]"
+    """Liste des entrées de l'historique des appels VoIP."""
+
+
+@dataclass
 class VoipInfo(DataClassDictMixin):
     """Informations sur la voix sur IP."""
 
