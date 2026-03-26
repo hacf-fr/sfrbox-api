@@ -26,8 +26,10 @@ from .exceptions import SFRBoxError
 from .models import DslInfo
 from .models import FtthInfo
 from .models import SystemInfo
+
 from .models import VoipCallHistory
 from .models import VoipCallHistoryEntry
+from .models import VoipInfo
 from .models import WanInfo
 from .models import WlanClient
 from .models import WlanClientList
@@ -245,6 +247,12 @@ class SFRBox:
             call_details = self._create_class(VoipCallHistoryEntry, call)
             calls.append(call_details)  # type: ignore[arg-type]
         return VoipCallHistory(entries=calls)
+
+    async def voip_get_info(self) -> VoipInfo | None:
+        """Renvoie les informations sur la voix sur IP."""
+        token = await self._ensure_token()
+        xml_response = await self._send_get("voip", "getInfo", token=token)
+        return self._create_class(VoipInfo, xml_response)
 
     async def wan_get_info(self) -> WanInfo | None:
         """Renvoie les informations génériques sur la connexion internet."""

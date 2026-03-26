@@ -160,6 +160,31 @@ class VoipCallHistory(DataClassDictMixin):
 
 
 @dataclass
+class VoipInfo(DataClassDictMixin):
+    """Informations sur la voix sur IP."""
+
+    status: str
+    """Status du service VOIP.
+
+    = (up|down)"""
+    infra: str
+    """Lien utilisé pour la téléphonie.
+
+    (firmware >= 2.1.2)
+    = (adsl|ftth|gprs)"""
+    hook_status: str
+    """Status du combiné téléphonique.
+
+    (firmware >= 2.1.2)
+    = (onhook|offhook|unknown)"""
+    callhistory_active: str
+    """Activation de l'historique des appels.
+
+    (firmware >= 3.0.7)
+    = (on|off)"""
+
+
+@dataclass
 class WanInfo(DataClassDictMixin):
     """Informations génériques sur la connexion internet."""
 
