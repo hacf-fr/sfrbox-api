@@ -155,7 +155,7 @@ class VoipCallHistoryCall(DataClassDictMixin):
 class VoipCallHistoryList(DataClassDictMixin):
     """Historique des appels VoIP."""
 
-    entries: "list[VoipCallHistoryCall]"
+    calls: "list[VoipCallHistoryCall]"
     """Liste des entrées de l'historique des appels VoIP."""
 
 
