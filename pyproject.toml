@@ -47,6 +47,7 @@ Changelog = "https://github.com/hacf-fr/sfrbox-api/releases"
 dev = [
     "aiointercept==0.1.12",
     "codespell==2.4.3",
+    "covdefaults==2.3.0",
     "coverage[toml]==7.16.2",
     "pre-commit-hooks==6.0.0",
     "prek==0.5.4",
@@ -80,11 +81,12 @@ source = ["src", "*/site-packages"]
 tests = ["tests", "*/tests"]
 
 [tool.coverage.run]
-branch = true
+plugins = ["covdefaults"]
 source = ["sfrbox_api", "tests"]
 
-[tool.coverage.report]
-show_missing = true
+[tool.coverage.covdefaults]
+# cli/__main__.py holds the whole CLI entry point, keep measuring it
+subtract_omit = "*/__main__.py"
 
 [tool.ty.environment]
 python-version = "3.10"
