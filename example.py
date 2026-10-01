@@ -1,4 +1,4 @@
-"""Sample interation with SFRBox."""
+"""Sample interaction with SFRBox."""
 
 from __future__ import annotations
 

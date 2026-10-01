@@ -79,7 +79,7 @@ Run the type checker and the linters:
 
 ```console
 $ uv run ty check src tests docs/conf.py
-$ uv run pre-commit run --all-files
+$ uv run prek run --all-files
 ```
 
 Build the documentation (Python 3.14+):
@@ -105,10 +105,10 @@ Your pull request needs to meet the following guidelines for acceptance:
 
 Feel free to submit early, though—we can always iterate on this.
 
-To run linting and code formatting checks before committing your change, you can install pre-commit as a Git hook by running the following command:
+To run linting and code formatting checks before committing your change, you can install prek as a Git hook by running the following command:
 
 ```console
-$ uv run pre-commit install
+$ uv run prek install
 ```
 
 It is recommended to open an issue before starting work on anything.
