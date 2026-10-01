@@ -109,7 +109,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6.3.0
         with:
-          python-version: "3.14.6"
+          python-version: "3.14.8"
 
       - name: Upgrade pip
         run: |
