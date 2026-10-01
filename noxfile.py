@@ -132,7 +132,7 @@ def ty(session: Session) -> None:
     """Type-check using ty."""
     args = session.posargs or ["src", "tests", "docs/conf.py"]
     session.install(".[cli]")
-    session.install("ty", "pytest", "aioresponses")
+    session.install("ty", "pytest", "aiointercept")
     session.run("ty", "check", *args)
 
 
@@ -141,7 +141,7 @@ def tests(session: Session) -> None:
     """Run the test suite."""
     session.install(".[cli]")
     session.install(
-        "coverage[toml]", "pytest", "pytest-asyncio", "aioresponses"
+        "coverage[toml]", "pytest", "pytest-asyncio", "aiointercept"
     )
     try:
         session.run(
