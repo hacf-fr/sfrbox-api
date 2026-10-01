@@ -26,7 +26,7 @@ async def main() -> None:
 
         if username and password:
             await box.authenticate(username=username, password=password)
-            # await box.system_reboot()
+            # Authenticated calls such as system_reboot are now allowed.
 
 
 if __name__ == "__main__":
