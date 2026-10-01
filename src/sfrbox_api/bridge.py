@@ -11,18 +11,17 @@ from collections.abc import Mapping
 from functools import wraps
 from typing import Any
 from typing import TypeVar
-from xml.etree.ElementTree import Element as XmlElement  # noqa: S405
+from xml.etree.ElementTree import Element as XmlElement
 
 import aiohttp
 import defusedxml.ElementTree as DefusedElementTree
 from mashumaro import DataClassDictMixin
 from typing_extensions import ParamSpec
 
-from sfrbox_api.helpers import compute_hash
-
 from .exceptions import SFRBoxApiError
 from .exceptions import SFRBoxAuthenticationError
 from .exceptions import SFRBoxError
+from .helpers import compute_hash
 from .models import DslInfo
 from .models import FtthInfo
 from .models import SystemInfo
@@ -97,7 +96,7 @@ class SFRBox:
         if not (self._username and self._password):
             raise SFRBoxAuthenticationError("Credentials not set")
         element = await self._send_get("auth", "getToken")
-        assert element is not None  # noqa: S101
+        assert element is not None
         if (method := element.get("method")) not in {"all", "passwd"}:
             raise SFRBoxAuthenticationError(
                 f"Password authentication is not allowed, valid methods: `{method}`"
@@ -107,7 +106,7 @@ class SFRBox:
         element = await self._send_get(
             "auth", "checkToken", token=token, hash=hash
         )
-        assert element is not None  # noqa: S101
+        assert element is not None
         return element.get("token", "")
 
     async def _check_response(
@@ -275,9 +274,9 @@ class SFRBox:
         """Renvoie les informations sur le WiFi."""
         token = await self._ensure_token()
         xml_response = await self._send_get("wlan", "getInfo", token=token)
-        assert xml_response is not None  # noqa: S101
+        assert xml_response is not None
         wl0_element = xml_response.find("wl0")
-        assert wl0_element is not None  # noqa: S101
+        assert wl0_element is not None
         wl0 = WlanWl0Info(**wl0_element.attrib)
         return WlanInfo(**xml_response.attrib, wl0=wl0)
 
