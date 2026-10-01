@@ -46,17 +46,13 @@ Request features on the [Issue Tracker].
 
 ## How to set up your development environment
 
-You need Python 3.10+ and the following tools:
-
-- [Poetry]
-- [Nox]
-- [nox-poetry]
-- [Node.js] (version in `.nvmrc`), for Prettier
+You need Python 3.10+, [uv] and [Node.js]
+(the version in `.nvmrc`, used to run Prettier).
 
 Install the package with development requirements:
 
 ```console
-$ poetry install
+$ uv sync --all-extras
 $ npm ci
 ```
 
@@ -64,34 +60,32 @@ You can now run an interactive Python session,
 or the command-line interface:
 
 ```console
-$ poetry run python
-$ poetry run sfrbox-api
+$ uv run python
+$ uv run sfrbox-api
 ```
 
-[poetry]: https://python-poetry.org/
-[nox]: https://nox.thea.codes/
-[nox-poetry]: https://nox-poetry.readthedocs.io/
+[uv]: https://docs.astral.sh/uv/
 [node.js]: https://nodejs.org/
 
 ## How to test the project
 
-Run the full test suite:
+Run the unit test suite:
 
 ```console
-$ nox
+$ uv run pytest
 ```
 
-List the available Nox sessions:
+Run the type checker and the linters:
 
 ```console
-$ nox --list-sessions
+$ uv run ty check src tests docs/conf.py
+$ uv run pre-commit run --all-files
 ```
 
-You can also run a specific Nox session.
-For example, invoke the unit test suite like this:
+Build the documentation (Python 3.14+):
 
 ```console
-$ nox --session=tests
+$ uv run sphinx-build docs docs/_build
 ```
 
 Unit tests are located in the _tests_ directory,
@@ -105,7 +99,7 @@ Open a [pull request] to submit changes to this project.
 
 Your pull request needs to meet the following guidelines for acceptance:
 
-- The Nox test suite must pass without errors and warnings.
+- The test suite, type checker and linters must pass without errors and warnings.
 - Include unit tests. This project maintains 100% code coverage.
 - If your changes add functionality, update the documentation accordingly.
 
@@ -114,7 +108,7 @@ Feel free to submit early, though—we can always iterate on this.
 To run linting and code formatting checks before committing your change, you can install pre-commit as a Git hook by running the following command:
 
 ```console
-$ nox --session=pre-commit -- install
+$ uv run pre-commit install
 ```
 
 It is recommended to open an issue before starting work on anything.

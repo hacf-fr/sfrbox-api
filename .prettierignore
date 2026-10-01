@@ -5,15 +5,13 @@
 .pytest_cache/
 
 # Linters
-.mypy_cache/
 .ruff_cache/
 
 # Virtual env
 .venv
-/.nox/
 
 # Lock files
-poetry.lock
+uv.lock
 package-lock.json
 
 # Node

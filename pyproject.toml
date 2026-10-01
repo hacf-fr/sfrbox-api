@@ -1,17 +1,19 @@
-[tool.poetry]
+[project]
 name = "sfrbox-api"
 version = "0.0.0"
 description = "SFR Box API"
-authors = ["epenet", "HACF <contact@hacf.fr>"]
+authors = [
+    { name = "epenet" },
+    { name = "HACF", email = "contact@hacf.fr" },
+]
 license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
 readme = "README.md"
-homepage = "https://github.com/hacf-fr/sfrbox-api"
-repository = "https://github.com/hacf-fr/sfrbox-api"
-documentation = "https://sfrbox-api.readthedocs.io"
-keywords=["sfrbox", "router"]
+keywords = ["sfrbox", "router"]
 classifiers = [
     "Operating System :: OS Independent",
-    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -21,43 +23,49 @@ classifiers = [
     "Intended Audience :: System Administrators",
     "Topic :: Home Automation",
 ]
+dependencies = [
+    "aiohttp>=3.9.5",
+    "defusedxml>=0.7.1",
+    "mashumaro>=3.13.1",
+]
 
-[tool.poetry.urls]
+[project.optional-dependencies]
+cli = [
+    "click>=8.0.1",
+]
+
+[project.scripts]
+sfrbox-api = "sfrbox_api.cli.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/hacf-fr/sfrbox-api"
+Repository = "https://github.com/hacf-fr/sfrbox-api"
+Documentation = "https://sfrbox-api.readthedocs.io"
 Changelog = "https://github.com/hacf-fr/sfrbox-api/releases"
 
-[tool.poetry.requires-plugins]
-poetry-plugin-export = ">=1.8"
-
-[tool.poetry.dependencies]
-python = ">=3.10,<4.0"
-aiohttp = ">=3.9.5"
-defusedxml = ">=0.7.1"
-mashumaro = ">=3.13.1"
-click = { version = ">=8.0.1", optional = true }
-
-[tool.poetry.group.dev.dependencies]
-ruff = "==0.16.9"
-coverage = {extras = ["toml"], version = "==7.16.2"}
-pre-commit = "==4.6.2"
-pre-commit-hooks = "==6.0.0"
-pytest = "==9.1.1"
-pytest-asyncio = "==1.4.0"
-pytest-cov = "==7.1.0"
-ty = "==0.0.84"
-aiointercept = "==0.1.12"
-
+[dependency-groups]
+dev = [
+    "aiointercept==0.1.12",
+    "coverage[toml]==7.16.2",
+    "pre-commit==4.6.2",
+    "pre-commit-hooks==6.0.0",
+    "pytest==9.1.1",
+    "pytest-asyncio==1.4.0",
+    "pytest-cov==7.1.0",
+    "ruff==0.16.9",
+    "ty==0.0.84",
+]
 # docs (Python >= 3.14)
-furo = {version = "==2025.12.19", python = ">=3.14"}
-myst-parser = {version = "==5.1.0", python = ">=3.14"}
-sphinx = {version = "==9.1.0", python = ">=3.14"}
-sphinx-autobuild = {version = "==2025.8.25", python = ">=3.14"}
-sphinx-click = {version = "==6.2.0", python = ">=3.14"}
+docs = [
+    "furo==2025.12.19; python_version >= '3.14'",
+    "myst-parser==5.1.0; python_version >= '3.14'",
+    "sphinx==9.1.0; python_version >= '3.14'",
+    "sphinx-autobuild==2025.8.25; python_version >= '3.14'",
+    "sphinx-click==6.2.0; python_version >= '3.14'",
+]
 
-[tool.poetry.extras]
-cli = ["click"]
-
-[tool.poetry.scripts]
-sfrbox-api = "sfrbox_api.cli.__main__:main"
+[tool.uv]
+default-groups = ["dev", "docs"]
 
 [tool.coverage.paths]
 source = ["src", "*/site-packages"]
@@ -123,5 +131,5 @@ max-complexity = 10
 convention = "google"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["uv_build>=0.12.21,<0.13"]
+build-backend = "uv_build"
