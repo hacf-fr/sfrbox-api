@@ -240,10 +240,10 @@ class SFRBox:
         xml_response = await self._send_get_simple(
             "voip", "getCallhistoryList", token=token
         )
-        calls: list[VoipCallHistoryCall] = []
-        for call in xml_response.findall("calls/call"):
-            call_details = self._create_class(VoipCallHistoryCall, call)
-            calls.append(call_details)  # type: ignore[arg-type]
+        calls = [
+            VoipCallHistoryCall.from_dict({**call.attrib})
+            for call in xml_response.findall("calls/call")
+        ]
         return VoipCallHistoryList(calls=calls)
 
     async def voip_get_info(self) -> VoipInfo | None:
