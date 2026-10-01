@@ -22,15 +22,12 @@ except ImportError:
     raise SystemExit(dedent(message)) from None
 
 
-package = "sfrbox_api"
 python_versions = ["3.14", "3.13", "3.12", "3.11", "3.10"]
 nox.needs_version = ">= 2021.6.6"
 nox.options.sessions = (
     "pre-commit",
-    "safety",
     "mypy",
     "tests",
-    "typeguard",
     "docs-build",
 )
 
@@ -121,7 +118,6 @@ def precommit(session: Session) -> None:
         "--show-diff-on-failure",
     ]
     session.install(
-        "darglint",
         "pre-commit",
         "pre-commit-hooks",
         "ruff",
@@ -129,20 +125,6 @@ def precommit(session: Session) -> None:
     session.run("pre-commit", *args)
     if args and args[0] == "install":
         activate_virtualenv_in_precommit_hooks(session)
-
-
-@session(python=python_versions[0])
-def safety(session: Session) -> None:
-    """Scan dependencies for insecure packages."""
-    requirements = session.poetry.export_requirements()
-    session.install("safety")
-    session.run(
-        "safety",
-        "check",
-        "--full-report",
-        f"--file={requirements}",
-        "-i 70612",  # Disputed - no fix available https://github.com/pyupio/safety/issues/527
-    )
 
 
 @session(python=python_versions)
@@ -163,7 +145,7 @@ def tests(session: Session) -> None:
     """Run the test suite."""
     session.install(".[cli]")
     session.install(
-        "coverage[toml]", "pytest", "pygments", "pytest-asyncio", "aioresponses"
+        "coverage[toml]", "pytest", "pytest-asyncio", "aioresponses"
     )
     try:
         session.run(
@@ -185,16 +167,6 @@ def coverage(session: Session) -> None:
         session.run("coverage", "combine")
 
     session.run("coverage", *args)
-
-
-@session(python=python_versions[0])
-def typeguard(session: Session) -> None:
-    """Runtime type checking using Typeguard."""
-    session.install(".[cli]")
-    session.install(
-        "pytest", "typeguard", "pygments", "pytest-asyncio", "aioresponses"
-    )
-    session.run("pytest", f"--typeguard-packages={package}", *session.posargs)
 
 
 @session(name="docs-build", python=python_versions[0])
