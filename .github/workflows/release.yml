@@ -8,6 +8,9 @@ on:
 permissions:
   contents: read
 
+env:
+  DEFAULT_PYTHON: "3.14"
+
 jobs:
   release:
     name: Release to PyPI
@@ -22,24 +25,17 @@ jobs:
       id-token: write
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      - name: Set up Python
-        uses: actions/setup-python@v6.3.0
+      - name: Set up uv and Python
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
-          python-version: "3.14.6"
-
-      - name: Upgrade pip
-        run: |
-          pip install --constraint=.github/workflows/constraints.txt pip
-          pip --version
-
-      - name: Install Poetry
-        run: |
-          pip install --constraint=.github/workflows/constraints.txt poetry
-          poetry --version
+          version: "0.12.21"
+          python-version: ${{ env.DEFAULT_PYTHON }}
+          # No cache on release builds, to avoid cache poisoning
+          enable-cache: false
 
       - name: Set package version
         env:
@@ -47,11 +43,11 @@ jobs:
         run: |
           version="${RELEASE_TAG,,}"
           version="${version#v}"
-          poetry version "${version}"
+          uv version "${version}" --frozen
 
       - name: Build package
         run: |
-          poetry build --ansi
+          uv build
 
       - name: Locate built wheel
         run: |
