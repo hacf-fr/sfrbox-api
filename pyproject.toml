@@ -119,13 +119,14 @@ select = [
     "N", #pep8-naming
     "PL", #Pylint
     "PT", #flake8-pytest-style
+    "RUF100", #unused-noqa
     "UP", #pyupgrade
 ]
 
 [tool.ruff.lint.isort]
 force-single-line = true
 known-local-folder = [
-    "renault_api",
+    "sfrbox_api",
 ]
 
 [tool.ruff.lint.mccabe]

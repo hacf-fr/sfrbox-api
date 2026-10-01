@@ -47,11 +47,11 @@ async def test_authenticate(mocked_responses: aioresponses) -> None:
     )
     async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
-        await box.authenticate(password="password")  # noqa: S106
+        await box.authenticate(password="password")
 
         assert box._username == "admin"
-        assert box._password == "password"  # noqa: S105
-        assert box._token == "afd1baa4cb261bfc08ec2dc0ade3b4"  # noqa: S105
+        assert box._password == "password"
+        assert box._token == "afd1baa4cb261bfc08ec2dc0ade3b4"
 
         # Ensure subsequent calls return existing token
         mocked_responses.clear()
@@ -77,16 +77,16 @@ async def test_authenticate_invalid_password(
 
     async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
-        box._token = "previous_token"  # noqa: S105
+        box._token = "previous_token"
         with pytest.raises(
             SFRBoxAuthenticationError,
             match=re.escape(
                 "Api call failed: [204] Invalid login and/or password"
             ),
         ):
-            await box.authenticate(password="invalid_password")  # noqa: S106
+            await box.authenticate(password="invalid_password")
     assert box._username == "admin"
-    assert box._password == "invalid_password"  # noqa: S105
+    assert box._password == "invalid_password"
     assert box._token is None
 
 
@@ -116,7 +116,7 @@ async def test_authenticate_method_not_allowed(
             SFRBoxAuthenticationError,
             match="Password authentication is not allowed, valid methods: `button`",
         ):
-            await box.authenticate(password="password")  # noqa: S106
+            await box.authenticate(password="password")
 
 
 @pytest.mark.asyncio
@@ -134,7 +134,7 @@ async def test_authenticate_method_not_allowed_domain(
             SFRBoxAuthenticationError,
             match="Password authentication is not allowed, valid methods: `button`",
         ):
-            await box.authenticate(password="password")  # noqa: S106
+            await box.authenticate(password="password")
 
 
 @pytest.mark.asyncio
@@ -152,7 +152,7 @@ async def test_authenticate_method_not_allowed_domain_and_path(
             SFRBoxAuthenticationError,
             match="Password authentication is not allowed, valid methods: `button`",
         ):
-            await box.authenticate(password="password")  # noqa: S106
+            await box.authenticate(password="password")
 
 
 @pytest.mark.asyncio
@@ -170,7 +170,7 @@ async def test_authenticate_method_not_allowed_https_and_domain(
             SFRBoxAuthenticationError,
             match="Password authentication is not allowed, valid methods: `button`",
         ):
-            await box.authenticate(password="password")  # noqa: S106
+            await box.authenticate(password="password")
 
 
 @pytest.mark.asyncio
@@ -386,7 +386,7 @@ async def test_system_reboot(mocked_responses: aioresponses) -> None:
     )
     async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
-        box._token = "afd1baa4cb261bfc08ec2dc0ade3b4"  # noqa: S105
+        box._token = "afd1baa4cb261bfc08ec2dc0ade3b4"
         box._token_time = time.time()
         await box.system_reboot()
 
@@ -400,7 +400,7 @@ async def test_system_reboot_bad_auth(mocked_responses: aioresponses) -> None:
     )
     async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
-        box._token = "invalid_token"  # noqa: S105
+        box._token = "invalid_token"
         box._token_time = time.time()
         with pytest.raises(
             SFRBoxAuthenticationError,
@@ -418,7 +418,7 @@ async def test_voip_getcallhistorylist(mocked_responses: aioresponses) -> None:
     )
     async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
-        box._token = "afd1baa4cb261bfc08ec2dc0ade3b4"  # noqa: S105
+        box._token = "afd1baa4cb261bfc08ec2dc0ade3b4"
         box._token_time = time.time()
         calls = await box.voip_get_call_history_list()
         assert calls == VoipCallHistoryList(
@@ -478,7 +478,7 @@ async def test_voip_getinfo(mocked_responses: aioresponses) -> None:
     )
     async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
-        box._token = "afd1baa4cb261bfc08ec2dc0ade3b4"  # noqa: S105
+        box._token = "afd1baa4cb261bfc08ec2dc0ade3b4"
         box._token_time = time.time()
         info = await box.voip_get_info()
         assert info == VoipInfo(
@@ -521,7 +521,7 @@ async def test_wlan_getclientlist(mocked_responses: aioresponses) -> None:
     )
     async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
-        box._token = "afd1baa4cb261bfc08ec2dc0ade3b4"  # noqa: S105
+        box._token = "afd1baa4cb261bfc08ec2dc0ade3b4"
         box._token_time = time.time()
         info = await box.wlan_get_client_list()
         assert info == WlanClientList(
@@ -545,7 +545,7 @@ async def test_wlan_getinfo(mocked_responses: aioresponses) -> None:
     )
     async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
-        box._token = "afd1baa4cb261bfc08ec2dc0ade3b4"  # noqa: S105
+        box._token = "afd1baa4cb261bfc08ec2dc0ade3b4"
         box._token_time = time.time()
         info = await box.wlan_get_info()
         assert info == WlanInfo(
@@ -664,7 +664,7 @@ async def test_enable_wifi(mocked_responses: aioresponses) -> None:
     )
     async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
-        box._token = "afd1baa4cb261bfc08ec2dc0ade3b4"  # noqa: S105
+        box._token = "afd1baa4cb261bfc08ec2dc0ade3b4"
         box._token_time = time.time()
         await box.wlan_enable()
 
@@ -678,7 +678,7 @@ async def test_enable_wifi_bad_auth(mocked_responses: aioresponses) -> None:
     )
     async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
-        box._token = "invalid_token"  # noqa: S105
+        box._token = "invalid_token"
         box._token_time = time.time()
         with pytest.raises(
             SFRBoxAuthenticationError,
@@ -696,7 +696,7 @@ async def test_disable_wifi(mocked_responses: aioresponses) -> None:
     )
     async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
-        box._token = "afd1baa4cb261bfc08ec2dc0ade3b4"  # noqa: S105
+        box._token = "afd1baa4cb261bfc08ec2dc0ade3b4"
         box._token_time = time.time()
         await box.wlan_disable()
 
@@ -710,7 +710,7 @@ async def test_disable_wifi_bad_auth(mocked_responses: aioresponses) -> None:
     )
     async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
-        box._token = "invalid_token"  # noqa: S105
+        box._token = "invalid_token"
         box._token_time = time.time()
         with pytest.raises(
             SFRBoxAuthenticationError,
@@ -728,7 +728,7 @@ async def test_restart_wifi(mocked_responses: aioresponses) -> None:
     )
     async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
-        box._token = "afd1baa4cb261bfc08ec2dc0ade3b4"  # noqa: S105
+        box._token = "afd1baa4cb261bfc08ec2dc0ade3b4"
         box._token_time = time.time()
         await box.wlan_restart()
 
@@ -742,7 +742,7 @@ async def test_restart_wifi_bad_auth(mocked_responses: aioresponses) -> None:
     )
     async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="192.168.0.1", client=client)
-        box._token = "invalid_token"  # noqa: S105
+        box._token = "invalid_token"
         box._token_time = time.time()
         with pytest.raises(
             SFRBoxAuthenticationError,
