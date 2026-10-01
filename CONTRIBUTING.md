@@ -51,11 +51,13 @@ You need Python 3.10+ and the following tools:
 - [Poetry]
 - [Nox]
 - [nox-poetry]
+- [Node.js] (version in `.nvmrc`), for Prettier
 
 Install the package with development requirements:
 
 ```console
 $ poetry install
+$ npm ci
 ```
 
 You can now run an interactive Python session,
@@ -69,6 +71,7 @@ $ poetry run sfrbox-api
 [poetry]: https://python-poetry.org/
 [nox]: https://nox.thea.codes/
 [nox-poetry]: https://nox-poetry.readthedocs.io/
+[node.js]: https://nodejs.org/
 
 ## How to test the project
 
