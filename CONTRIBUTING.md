@@ -46,7 +46,15 @@ Request features on the [Issue Tracker].
 
 ## How to set up your development environment
 
-You need Python 3.10+, [uv] and [Node.js]
+The easiest way to get started is to use the [Dev Container],
+which comes with Python, uv and all development tools pre-installed:
+open the repository in VS Code and select _Reopen in Container_,
+or [open it in a new Dev Container] directly.
+
+[dev container]: https://code.visualstudio.com/docs/devcontainers/containers
+[open it in a new dev container]: https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/hacf-fr/sfrbox-api
+
+For a manual setup, you need Python 3.10+, [uv] and [Node.js]
 (the version in `.nvmrc`, used to run Prettier).
 
 Install the package with development requirements:
