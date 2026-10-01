@@ -1,0 +1,14 @@
+{
+  "name": "sfrbox-api",
+  "version": "0.0.0",
+  "private": true,
+  "description": "SFR Box API",
+  "scripts": {
+    "prettier": "prettier --write ."
+  },
+  "author": "epenet",
+  "license": "MIT",
+  "devDependencies": {
+    "prettier": "3.9.9"
+  }
+}

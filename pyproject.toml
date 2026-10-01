@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sfrbox-api"
-version = "0.1.1"
+version = "0.0.0"
 description = "SFR Box API"
 authors = ["epenet", "HACF <contact@hacf.fr>"]
 license = "MIT"
@@ -36,7 +36,7 @@ mashumaro = ">=3.13.1"
 click = { version = ">=8.0.1", optional = true }
 
 [tool.poetry.group.dev.dependencies]
-ruff = "==0.15.20"
+ruff = "==0.16.9"
 coverage = {extras = ["toml"], version = "==7.15.0"}
 pre-commit = "==4.6.0"
 pre-commit-hooks = "==6.0.0"

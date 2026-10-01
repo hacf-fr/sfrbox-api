@@ -33,13 +33,15 @@ repos:
         language: system
         types: [python]
         require_serial: true
+      - id: prettier
+        name: Prettier
+        entry: npm run prettier
+        language: system
+        types_or: [yaml, json, markdown]
+        pass_filenames: false
       - id: trailing-whitespace
         name: Trim Trailing Whitespace
         entry: trailing-whitespace-fixer
         language: system
         types: [text]
         stages: [pre-commit, pre-push, manual]
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v2.6.0
-    hooks:
-      - id: prettier
