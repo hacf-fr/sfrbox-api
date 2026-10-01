@@ -38,7 +38,7 @@ click = { version = ">=8.0.1", optional = true }
 [tool.poetry.group.dev.dependencies]
 ruff = "==0.16.9"
 coverage = {extras = ["toml"], version = "==7.16.2"}
-pre-commit = "==4.6.0"
+pre-commit = "==4.6.2"
 pre-commit-hooks = "==6.0.0"
 pytest = "==9.1.1"
 pytest-asyncio = "==1.4.0"
