@@ -1,0 +1,20 @@
+/.coverage
+/.coverage.*
+/dist/
+/docs/_build/
+.pytest_cache/
+
+# Linters
+.mypy_cache/
+.ruff_cache/
+
+# Virtual env
+.venv
+/.nox/
+
+# Lock files
+poetry.lock
+package-lock.json
+
+# Node
+node_modules/
