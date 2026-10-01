@@ -40,5 +40,5 @@
   "image": "mcr.microsoft.com/devcontainers/python:3.14",
   "name": "SFR Box API",
   "onCreateCommand": "pipx install uv",
-  "updateContentCommand": "uv sync --all-extras && npm ci"
+  "updateContentCommand": "uv sync --all-extras && npm ci && uv run prek install"
 }
