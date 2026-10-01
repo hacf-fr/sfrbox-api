@@ -1,0 +1,86 @@
+---
+name: Issue
+description: Report an issue with the sfrbox-api library.
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report an issue!
+
+        If you are using the Home Assistant `sfr_box` integration, please
+        check first whether the issue also happens with the library on its
+        own. Issues specific to Home Assistant should be reported to
+        [Home Assistant core](https://github.com/home-assistant/core/issues).
+
+        > [!WARNING]
+        > Debug logs and API responses contain **sensitive data**: box
+        > password and tokens, MAC addresses, serial numbers, IP addresses,
+        > WiFi names and keys, and phone numbers. Please **redact them**
+        > before posting anything below.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: >-
+        A clear description of what the issue is. What did you do, what
+        did you expect to see, and what did you see instead?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: sfrbox-api version
+      description: >-
+        The version of sfrbox-api you are using (`pip show sfrbox-api`).
+      placeholder: e.g., 0.1.1
+    validations:
+      required: true
+  - type: input
+    id: python-version
+    attributes:
+      label: Python version and operating system
+      placeholder: e.g., Python 3.13 on Ubuntu 24.04
+    validations:
+      required: true
+  - type: input
+    id: box
+    attributes:
+      label: Box model and firmware
+      description: >-
+        The model of your SFR box, its connection type (ADSL, FTTH, FTTB)
+        and firmware version if known (`system.getInfo`).
+      placeholder: e.g., BOX10H-SER-r0, FTTH, BOX10H-XbSP-1.6.14.1
+    validations:
+      required: false
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Code to reproduce
+      description: >-
+        A minimal Python snippet that reproduces the issue. Do not include
+        your credentials.
+      render: python
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: Debug logs or API responses
+      description: >-
+        Relevant debug output or XML responses from the box.
+        **Redact your password, tokens, MAC addresses, serial numbers,
+        WiFi keys and phone numbers before posting.**
+      render: text
+    validations:
+      required: false
+  - type: textarea
+    id: additional-information
+    attributes:
+      label: Additional information
+      description: >-
+        Any additional context, screenshots, or other information that
+        might help.
+    validations:
+      required: false
