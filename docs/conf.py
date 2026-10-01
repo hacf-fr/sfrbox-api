@@ -4,7 +4,7 @@ from datetime import datetime
 
 project = "SFR Box API"
 author = "HACF (created and maintained by @epenet)"
-copyright = f"{datetime.now().year}, {author}"
+copyright = f"{datetime.now().year}, {author}"  # noqa: A001
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",

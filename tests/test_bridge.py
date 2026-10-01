@@ -26,9 +26,7 @@ from sfrbox_api.models import WlanWl0Info
 
 
 def _load_fixture(filename: str) -> str:
-    return (
-        pathlib.Path(__file__).parent.joinpath("fixtures", filename).read_text()
-    )
+    return pathlib.Path(__file__).parent.joinpath("fixtures", filename).read_text()
 
 
 @pytest.mark.asyncio
@@ -80,9 +78,7 @@ async def test_authenticate_invalid_password(
         box._token = "previous_token"
         with pytest.raises(
             SFRBoxAuthenticationError,
-            match=re.escape(
-                "Api call failed: [204] Invalid login and/or password"
-            ),
+            match=re.escape("Api call failed: [204] Invalid login and/or password"),
         ):
             await box.authenticate(password="invalid_password")
     assert box._username == "admin"
@@ -95,9 +91,7 @@ async def test_authenticate_no_credentials() -> None:
     """It exits with a status code of zero."""
     async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="sfrbox.test", client=client)
-        with pytest.raises(
-            SFRBoxAuthenticationError, match="Credentials not set"
-        ):
+        with pytest.raises(SFRBoxAuthenticationError, match="Credentials not set"):
             await box._ensure_token()
 
 
@@ -526,12 +520,8 @@ async def test_wlan_getclientlist(mocked_responses: aiointercept) -> None:
         info = await box.wlan_get_client_list()
         assert info == WlanClientList(
             clients=[
-                WlanClient(
-                    mac_addr="01:02:03:04:05:06", ip_addr="192.168.1.23"
-                ),
-                WlanClient(
-                    mac_addr="06:07:08:09:10:11", ip_addr="192.168.1.24"
-                ),
+                WlanClient(mac_addr="01:02:03:04:05:06", ip_addr="192.168.1.23"),
+                WlanClient(mac_addr="06:07:08:09:10:11", ip_addr="192.168.1.24"),
             ]
         )
 
@@ -574,9 +564,7 @@ async def test_wan_getinfo_fail(mocked_responses: aiointercept) -> None:
         box = SFRBox(ip="sfrbox.test", client=client)
         with pytest.raises(
             SFRBoxApiError,
-            match=re.escape(
-                "Api call failed: [[code-erreur]] [message-erreur]"
-            ),
+            match=re.escape("Api call failed: [[code-erreur]] [message-erreur]"),
         ):
             await box.wan_get_info()
 
@@ -589,9 +577,7 @@ async def test_wan_getinfo_invalid_xml(mocked_responses: aiointercept) -> None:
     )
     async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="sfrbox.test", client=client)
-        with pytest.raises(
-            SFRBoxError, match="Failed to parse response: Invalid XML"
-        ):
+        with pytest.raises(SFRBoxError, match="Failed to parse response: Invalid XML"):
             await box.wan_get_info()
 
 
@@ -606,9 +592,7 @@ async def test_wan_getinfo_incorrect_xml(
     )
     async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="sfrbox.test", client=client)
-        with pytest.raises(
-            SFRBoxError, match="Response was not ok: <incorrect_xml />"
-        ):
+        with pytest.raises(SFRBoxError, match="Response was not ok: <incorrect_xml />"):
             await box.wan_get_info()
 
 
@@ -623,9 +607,7 @@ async def test_wan_getinfo_incorrect_namespace(
     )
     async with aiohttp.ClientSession() as client:
         box = SFRBox(ip="sfrbox.test", client=client)
-        with pytest.raises(
-            SFRBoxError, match="Namespace wan not found in response"
-        ):
+        with pytest.raises(SFRBoxError, match="Namespace wan not found in response"):
             await box.wan_get_info()
 
 

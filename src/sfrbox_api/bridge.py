@@ -39,6 +39,10 @@ _T = TypeVar("_T", bound=DataClassDictMixin)
 _R = TypeVar("_R")
 _P = ParamSpec("_P")
 
+# La durée de validité du token semble être de 10 minutes.
+# On met 5 minutes (300 secondes) pour éviter les surprises.
+_TOKEN_LIFETIME = 300
+
 
 def _with_error_wrapping(
     func: Callable[_P, Awaitable[_R]],
@@ -75,9 +79,7 @@ class SFRBox:
             self._url = f"http://{ip}"
         self._client = client
 
-    async def authenticate(
-        self, *, username: str = "admin", password: str
-    ) -> None:
+    async def authenticate(self, *, username: str = "admin", password: str) -> None:
         """Initialise le token pour pouvoir accéder aux méthodes privées de l'API."""
         self._username = username
         self._password = password
@@ -85,9 +87,7 @@ class SFRBox:
         await self._ensure_token()
 
     async def _ensure_token(self) -> str:
-        # La durée de validité du token semble être de 10 minutes.
-        # On met 5 minutes (300 secondes) pour éviter les surprises.
-        if not self._token or (time.time() - self._token_time) > 300:
+        if not self._token or (time.time() - self._token_time) > _TOKEN_LIFETIME:
             self._token = await self._get_token()
             self._token_time = time.time()
         return self._token
@@ -102,16 +102,14 @@ class SFRBox:
                 f"Password authentication is not allowed, valid methods: `{method}`"
             )
         token = element.get("token", "")
-        hash = compute_hash(token, self._username, self._password)
+        token_hash = compute_hash(token, self._username, self._password)
         element = await self._send_get(
-            "auth", "checkToken", token=token, hash=hash
+            "auth", "checkToken", token=token, hash=token_hash
         )
         assert element is not None
         return element.get("token", "")
 
-    async def _check_response(
-        self, response: aiohttp.ClientResponse
-    ) -> XmlElement:
+    async def _check_response(self, response: aiohttp.ClientResponse) -> XmlElement:
         response_text = await response.text()
         _LOGGER.debug(
             'HTTP Response: %s %s "%s %s %s" %s',
@@ -123,7 +121,6 @@ class SFRBox:
             response_text,
         )
         response.raise_for_status()
-        response_text = response_text
         if "</firewall>" in response_text and "<dsl" in response_text:
             # There is a bug in firmware 3DCM020200r015
             response_text = response_text.replace("</firewall>", "/>")
@@ -131,9 +128,7 @@ class SFRBox:
         try:
             element: XmlElement = DefusedElementTree.fromstring(response_text)
         except Exception as exc:
-            raise SFRBoxError(
-                f"Failed to parse response: {response_text}"
-            ) from exc
+            raise SFRBoxError(f"Failed to parse response: {response_text}") from exc
         stat = element.get("stat", "")
         if (
             stat == "fail"
@@ -144,9 +139,7 @@ class SFRBox:
             if code in {"115", "204", "901"}:
                 # Reset token on auth failure
                 self._token = None
-                raise SFRBoxAuthenticationError(
-                    f"Api call failed: [{code}] {msg}"
-                )
+                raise SFRBoxAuthenticationError(f"Api call failed: [{code}] {msg}")
             raise SFRBoxApiError(f"Api call failed: [{code}] {msg}")
         if stat != "ok":
             raise SFRBoxError(f"Response was not ok: {response_text}")
@@ -157,9 +150,7 @@ class SFRBox:
         self, namespace: str, method: str, **kwargs: str
     ) -> XmlElement:
         params = {"method": f"{namespace}.{method}", **kwargs}
-        response = await self._client.get(
-            f"{self._url}/api/1.0/", params=params
-        )
+        response = await self._client.get(f"{self._url}/api/1.0/", params=params)
         element = await self._check_response(response)
         return element
 
@@ -168,9 +159,7 @@ class SFRBox:
         self, namespace: str, method: str, **kwargs: str
     ) -> XmlElement | None:
         params = {"method": f"{namespace}.{method}", **kwargs}
-        response = await self._client.get(
-            f"{self._url}/api/1.0/", params=params
-        )
+        response = await self._client.get(f"{self._url}/api/1.0/", params=params)
         element = await self._check_response(response)
         if len(element) == 0:
             return None
@@ -260,14 +249,10 @@ class SFRBox:
     async def wlan_get_client_list(self) -> WlanClientList:
         """Liste des clients WiFi."""
         token = await self._ensure_token()
-        xml_response = await self._send_get_simple(
-            "wlan", "getClientList", token=token
-        )
+        xml_response = await self._send_get_simple("wlan", "getClientList", token=token)
         client_elements = xml_response.findall("client")
         return WlanClientList(
-            clients=[
-                WlanClient(**element.attrib) for element in client_elements
-            ]
+            clients=[WlanClient(**element.attrib) for element in client_elements]
         )
 
     async def wlan_get_info(self) -> WlanInfo:
