@@ -1,0 +1,53 @@
+---
+name: Feature request
+description: >-
+  Request support for a new box model, API method or feature, or suggest
+  an improvement to the library.
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement!
+
+        > [!WARNING]
+        > Debug logs and API responses contain **sensitive data**: box
+        > password and tokens, MAC addresses, serial numbers, IP addresses,
+        > WiFi names and keys, and phone numbers. Please **redact them**
+        > before posting anything below.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: >-
+        Describe what you'd like to see. If your box behaves incorrectly,
+        explain what it currently does and what you expect it to do
+        instead.
+    validations:
+      required: true
+  - type: input
+    id: box
+    attributes:
+      label: Box model and firmware
+      placeholder: e.g., BOX10H-SER-r0, FTTH, BOX10H-XbSP-1.6.14.1
+    validations:
+      required: false
+  - type: textarea
+    id: samples
+    attributes:
+      label: Sample responses
+      description: >-
+        Anonymised XML responses for the relevant API methods
+        (e.g. `http://192.168.1.1/api/1.0/?method=system.getInfo`).
+      render: xml
+    validations:
+      required: false
+  - type: textarea
+    id: additional-information
+    attributes:
+      label: Additional information
+      description: >-
+        Any additional context, references, or links.
+    validations:
+      required: false

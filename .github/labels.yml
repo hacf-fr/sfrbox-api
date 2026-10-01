@@ -1,6 +1,8 @@
 ---
 # Labels names are important as they are used by Release Drafter to decide
 # regarding where to record them in changelog or if to skip them.
+# They are also used by Renovate (dependencies, no-stale, python,
+# github_actions) and by the Stale workflow (stale).
 #
 # The repository labels will be automatically configured using this file and
 # the GitHub Action https://github.com/marketplace/actions/github-labeler.
@@ -40,6 +42,9 @@
 - name: invalid
   description: This doesn't seem right
   color: e4e669
+- name: no-stale
+  description: Exempt from being marked as stale
+  color: fef2c0
 - name: performance
   description: Performance
   color: "016175"
@@ -55,6 +60,9 @@
 - name: removal
   description: Removals and Deprecations
   color: 9ae7ea
+- name: stale
+  description: No recent activity
+  color: ededed
 - name: style
   description: Style
   color: c120e5

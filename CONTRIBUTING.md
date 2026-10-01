@@ -31,6 +31,15 @@ When filing an issue, make sure to answer these questions:
 The best way to get your bug fixed is to provide a test case,
 and/or steps to reproduce the issue.
 
+Debug logs and API responses contain sensitive data (box password and
+tokens, MAC addresses, serial numbers, IP addresses, WiFi names and keys,
+phone numbers): redact them before posting.
+
+Please do not report security vulnerabilities on the Issue Tracker;
+see the [Security Policy] instead.
+
+[security policy]: https://github.com/hacf-fr/sfrbox-api/security/policy
+
 ## How to request a feature
 
 Request features on the [Issue Tracker].
@@ -108,6 +117,13 @@ $ nox --session=pre-commit -- install
 It is recommended to open an issue before starting work on anything.
 This will allow a chance to talk it over with the owners and validate your approach.
 
+## AI policy
+
+This project follows an [AI Policy]. In short: AI tools are welcome as an aid,
+but you must fully understand and be able to explain every change you submit.
+Contributions made by autonomous agents are not accepted.
+
+[ai policy]: https://github.com/hacf-fr/sfrbox-api/blob/main/AI_POLICY.md
 [pull request]: https://github.com/hacf-fr/sfrbox-api/pulls
 
 <!-- github-only -->
