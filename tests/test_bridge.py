@@ -167,6 +167,26 @@ async def test_authenticate_method_not_allowed_https_and_domain(
             await box.authenticate(password="password")
 
 
+@pytest.mark.parametrize(
+    ("ip", "expected"),
+    [
+        ("192.0.2.1", "http://192.0.2.1"),
+        ("192.0.2.1:8080", "http://192.0.2.1:8080"),
+        ("https://sfrbox.example.com/", "https://sfrbox.example.com"),
+        ("https://example.com/sfr/", "https://example.com/sfr"),
+        ("fe80::1", "http://[fe80::1]"),
+        ("http://[fe80::1]", "http://[fe80::1]"),
+    ],
+)
+@pytest.mark.asyncio
+async def test_base_url(ip: str, expected: str) -> None:
+    """It normalizes the base URL."""
+    async with aiohttp.ClientSession() as client:
+        box = SFRBox(ip=ip, client=client)
+
+        assert box.url == expected
+
+
 @pytest.mark.asyncio
 async def test_dsl_getinfo_3dcm020200r015(
     mocked_responses: aiointercept,
