@@ -5,9 +5,9 @@ class SFRBoxError(Exception):
     """SFR Box base exception."""
 
 
-class SFRBoxApiError(Exception):
+class SFRBoxApiError(SFRBoxError):
     """SFR Box api exception."""
 
 
-class SFRBoxAuthenticationError(Exception):
+class SFRBoxAuthenticationError(SFRBoxError):
     """SFR Box authentication exception."""
