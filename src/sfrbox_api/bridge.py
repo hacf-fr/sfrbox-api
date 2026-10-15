@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import contextlib
+import ipaddress
 import logging
 import time
 from collections.abc import Awaitable
@@ -74,9 +76,13 @@ class SFRBox:
     def __init__(self, *, ip: str, client: aiohttp.ClientSession) -> None:
         """Initialise SFR Box bridge."""
         if ip.startswith("http://") or ip.startswith("https://"):
-            self._url = ip
+            url = ip
         else:
-            self._url = f"http://{ip}"
+            with contextlib.suppress(ValueError):
+                if isinstance(ipaddress.ip_address(ip), ipaddress.IPv6Address):
+                    ip = f"[{ip}]"
+            url = f"http://{ip}"
+        self._url = url.rstrip("/")
         self._client = client
 
     async def authenticate(self, *, username: str = "admin", password: str) -> None:
