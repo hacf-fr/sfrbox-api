@@ -85,6 +85,11 @@ class SFRBox:
         self._url = url.rstrip("/")
         self._client = client
 
+    @property
+    def url(self) -> str:
+        """Renvoie l'URL de base de la box."""
+        return self._url
+
     async def authenticate(self, *, username: str = "admin", password: str) -> None:
         """Initialise le token pour pouvoir accéder aux méthodes privées de l'API."""
         self._username = username

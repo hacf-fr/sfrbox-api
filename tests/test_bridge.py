@@ -184,7 +184,7 @@ async def test_base_url(ip: str, expected: str) -> None:
     async with aiohttp.ClientSession() as client:
         box = SFRBox(ip=ip, client=client)
 
-        assert box._url == expected
+        assert box.url == expected
 
 
 @pytest.mark.asyncio
