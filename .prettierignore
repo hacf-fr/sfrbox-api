@@ -1,7 +1,6 @@
 /.coverage
 /.coverage.*
 /dist/
-/docs/_build/
 .pytest_cache/
 
 # Linters

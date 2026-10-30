@@ -13,7 +13,7 @@ Here is a list of important resources for contributors:
 
 [mit license]: https://opensource.org/licenses/MIT
 [source code]: https://github.com/hacf-fr/sfrbox-api
-[documentation]: https://sfrbox-api.readthedocs.io/
+[documentation]: https://github.com/hacf-fr/sfrbox-api#readme
 [issue tracker]: https://github.com/hacf-fr/sfrbox-api/issues
 
 ## How to report a bug
@@ -86,14 +86,8 @@ $ uv run pytest
 Run the type checker and the linters:
 
 ```console
-$ uv run ty check src tests docs/conf.py
+$ uv run ty check src tests
 $ uv run prek run --all-files
-```
-
-Build the documentation (Python 3.14+):
-
-```console
-$ uv run sphinx-build docs docs/_build
 ```
 
 Unit tests are located in the _tests_ directory,
@@ -109,7 +103,7 @@ Your pull request needs to meet the following guidelines for acceptance:
 
 - The test suite, type checker and linters must pass without errors and warnings.
 - Include unit tests. This project maintains 100% code coverage.
-- If your changes add functionality, update the documentation accordingly.
+- If your changes add functionality, update the README accordingly.
 
 Feel free to submit early, though—we can always iterate on this.
 
@@ -130,7 +124,4 @@ Contributions made by autonomous agents are not accepted.
 
 [ai policy]: https://github.com/hacf-fr/sfrbox-api/blob/main/AI_POLICY.md
 [pull request]: https://github.com/hacf-fr/sfrbox-api/pulls
-
-<!-- github-only -->
-
 [code of conduct]: CODE_OF_CONDUCT.md

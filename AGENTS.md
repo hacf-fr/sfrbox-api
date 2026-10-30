@@ -7,12 +7,11 @@ with a minimal `sfrbox-api` CLI. Its main consumer is the Home Assistant
 ## Commands
 
 ```console
-uv sync --all-extras                       # install (dev + docs groups by default)
+uv sync --all-extras                       # install (dev group by default)
 npm ci                                     # install prettier (Node version in .nvmrc)
 uv run pytest                              # tests
-uv run ty check src tests docs/conf.py     # type checking
+uv run ty check src tests                  # type checking
 uv run prek run --all-files                # ruff, prettier, codespell, yamllint, zizmor, ...
-uv run sphinx-build docs docs/_build       # docs (Python 3.14+ only)
 ```
 
 CI runs the same commands with `--locked`; keep `uv.lock` in sync with
@@ -27,7 +26,7 @@ CI runs the same commands with `--locked`; keep `uv.lock` in sync with
 - `src/sfrbox_api/cli/`: click CLI (entry point only for now).
 - `tests/fixtures/`: recorded XML responses, named `<method>.xml`, with a
   suffix for firmware-specific variants (e.g. `system.getInfo.3_5_8.xml`).
-- `docs/`: Sphinx with MyST Markdown.
+- `README.md`: the user documentation (there is no separate docs site).
 
 ## Conventions
 
