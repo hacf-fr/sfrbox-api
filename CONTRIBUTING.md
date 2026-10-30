@@ -54,7 +54,7 @@ or [open it in a new Dev Container] directly.
 [dev container]: https://code.visualstudio.com/docs/devcontainers/containers
 [open it in a new dev container]: https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/hacf-fr/sfrbox-api
 
-For a manual setup, you need Python 3.10+, [uv] and [Node.js]
+For a manual setup, you need Python 3.11+, [uv] and [Node.js]
 (the version in `.nvmrc`, used to run Prettier).
 
 Install the package with development requirements:

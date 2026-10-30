@@ -31,7 +31,7 @@ CI runs the same commands with `--locked`; keep `uv.lock` in sync with
 
 ## Conventions
 
-- Python 3.10+ (`target-version = "py310"`); don't use newer syntax.
+- Python 3.11+ (`target-version = "py311"`); don't use newer syntax.
 - Ruff with `force-single-line` imports and Google-style docstrings, line
   length 80. Existing docstrings are in French; codespell ignores those words
   in `[tool.codespell]`.
