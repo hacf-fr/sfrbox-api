@@ -39,7 +39,7 @@ sfrbox-api = "sfrbox_api.cli.__main__:main"
 [project.urls]
 Homepage = "https://github.com/hacf-fr/sfrbox-api"
 Repository = "https://github.com/hacf-fr/sfrbox-api"
-Documentation = "https://sfrbox-api.readthedocs.io"
+Documentation = "https://github.com/hacf-fr/sfrbox-api#readme"
 Changelog = "https://github.com/hacf-fr/sfrbox-api/releases"
 
 [dependency-groups]
@@ -58,17 +58,9 @@ dev = [
     "yamllint==1.38.0",
     "zizmor==1.31.1",
 ]
-# docs (Python >= 3.14)
-docs = [
-    "furo==2025.12.19; python_version >= '3.14'",
-    "myst-parser==5.1.0; python_version >= '3.14'",
-    "sphinx==9.1.0; python_version >= '3.14'",
-    "sphinx-autobuild==2025.8.25; python_version >= '3.14'",
-    "sphinx-click==6.2.0; python_version >= '3.14'",
-]
 
 [tool.uv]
-default-groups = ["dev", "docs"]
+default-groups = ["dev"]
 
 [tool.codespell]
 skip = "node_modules,package-lock.json,uv.lock,tests/fixtures"
