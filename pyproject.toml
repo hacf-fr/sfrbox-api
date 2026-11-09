@@ -54,7 +54,7 @@ dev = [
     "pytest-asyncio==1.4.1.post1",
     "pytest-cov==7.1.0",
     "ruff==0.17.4",
-    "ty==0.0.99",
+    "ty==0.0.100",
     "yamllint==1.38.0",
     "zizmor==1.32.0",
 ]
